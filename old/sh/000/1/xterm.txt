@@ -1,0 +1,5 @@
+#	Reconstructed via infocmp from file: /home/muon/bart/.terminfo/x/xterm
+xterm|X11 terminal emulator, 
+	am, km, 
+	it#8, 
+	cr=^M, dl=\E[M, rc=\E8, sc=\E7, 

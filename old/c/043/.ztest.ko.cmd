@@ -1,0 +1,1 @@
+cmd_/home/jukie/bart/work/snippets/c/043/ztest.ko := ld -m elf_i386 -m elf_i386 -r -o /home/jukie/bart/work/snippets/c/043/ztest.ko /home/jukie/bart/work/snippets/c/043/ztest.o /home/jukie/bart/work/snippets/c/043/ztest.mod.o

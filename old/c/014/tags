@@ -1,0 +1,54 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.2.3	//
+BP	heap.h	56;"	d
+BUG	heap.h	53;"	d
+HEAP_ADD	main.c	12;"	d	file:
+HEAP_DEPTH	heap.h	6;"	d
+HEAP_DUMP	main.c	14;"	d	file:
+HEAP_GET	main.c	13;"	d	file:
+HEAP_SIZE	heap.h	7;"	d
+OFS_INVAL	heap.h	11;"	d
+__HEAP_H__	heap.h	4;"	d
+__heap2_dump	minheap2.c	/^__heap2_dump (const char *prefix, heap_t *level2_heap)$/;"	f
+__heap_dump	heap.c	/^__heap_dump (const char *prefix, heap_t *heap)$/;"	f
+cnt	heap.h	/^	ofs_t 	cnt;		\/** number of elements in a heap *\/$/;"	m	struct:heap_s
+data	heap.h	/^	elem_t	data[HEAP_SIZE];$/;"	m	struct:heap_s
+debug	heap.c	/^int debug = 0;$/;"	v
+do_dequeue	main.c	/^do_dequeue (heap_t *heap, int no_dequeue)$/;"	f	file:
+do_enqueue	main.c	/^do_enqueue (heap_t *heap, int no_enqueue)$/;"	f	file:
+elem_get_key	heap.h	/^elem_get_key (elem_t elem)$/;"	f
+elem_t	heap.h	/^typedef unsigned int elem_t;$/;"	t
+heap2_dump	heap.h	/^static inline void heap2_dump (heap_t *heap) { __heap2_dump ("", heap); }$/;"	f
+heap_dump	heap.h	/^static inline void heap_dump (heap_t *heap) { __heap_dump ("", heap); }$/;"	f
+heap_init	heap.c	/^heap_init (heap_t *heap)$/;"	f
+heap_is_empty	heap.c	/^heap_is_empty (heap_t *heap)$/;"	f
+heap_is_full	heap.c	/^heap_is_full (heap_t *heap)$/;"	f
+heap_left_of	heap.c	/^heap_left_of (heap_t *heap, ofs_t ofs)$/;"	f
+heap_parent_of	heap.c	/^heap_parent_of (heap_t *heap, ofs_t ofs)$/;"	f
+heap_right_of	heap.c	/^heap_right_of (heap_t *heap, ofs_t ofs)$/;"	f
+heap_s	heap.h	/^typedef struct heap_s {$/;"	s
+heap_swap	heap.c	/^heap_swap (heap_t *heap, ofs_t a, ofs_t b)$/;"	f
+heap_t	heap.h	/^} heap_t;$/;"	t
+main	main.c	/^main (int argc, char *argv)$/;"	f
+max	heap.h	/^	key_t	max;		\/** key of maximum element *\/$/;"	m	struct:heap_s
+min	heap.h	/^	key_t	min;		\/** key of minimum element *\/$/;"	m	struct:heap_s
+minheap2_add	minheap2.c	/^minheap2_add (heap_t *level2_heap, elem_t elem)$/;"	f
+minheap2_add_first	minheap2.c	/^static inline int minheap2_add_first (heap_t *level2_heap, elem_t elem, $/;"	f	file:
+minheap2_add_try_after	minheap2.c	/^minheap2_add_try_after (heap_t *level2_heap, ofs_t loc, heap_t *level1_heap,$/;"	f	file:
+minheap2_add_try_before	minheap2.c	/^minheap2_add_try_before (heap_t *level2_heap, ofs_t loc, heap_t *level1_heap,$/;"	f	file:
+minheap2_create_level1_heap	minheap2.c	/^minheap2_create_level1_heap (heap_t *level2_heap, uint index)$/;"	f	file:
+minheap2_delete_level1_heap	minheap2.c	/^minheap2_delete_level1_heap (heap_t *level2_heap, uint index)$/;"	f	file:
+minheap2_get_first	minheap2.c	/^minheap2_get_first (heap_t *level2_heap, elem_t *elem)$/;"	f
+minheap_add	minheap.c	/^minheap_add (heap_t *heap, elem_t elem)$/;"	f
+minheap_get_first	minheap.c	/^minheap_get_first (heap_t *heap, elem_t *elem)$/;"	f
+no_dequeue_a	main.c	/^int no_dequeue_a = 0;$/;"	v
+no_dequeue_b	main.c	/^int no_dequeue_b = 0;$/;"	v
+no_enqueue_a	main.c	/^int no_enqueue_a = HEAP_SIZE;$/;"	v
+no_enqueue_b	main.c	/^int no_enqueue_b = 1;$/;"	v
+ofs_t	heap.h	/^typedef unsigned int ofs_t;$/;"	t
+pd	heap.h	58;"	d
+size	heap.h	/^	ofs_t	size;		\/** size of data[] array; must be (2^x-1) *\/$/;"	m	struct:heap_s

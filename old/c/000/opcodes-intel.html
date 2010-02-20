@@ -1,0 +1,5040 @@
+<HTML>
+<HEAD>
+<TITLE> Processor Information : Intel </TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<HR>
+Here is a list of instructions and opcodes used by Intel, AMD, Cyrix and Nexgen.<BR>
+We used <I> gdb </I> to get all the info out of the processors ;-) <BR>
+<P>
+
+<H2> Table of contents </H2>
+<UL> 
+<LI> <A HREF="#Technical"> Technical Specifications </A> <BR>
+<LI> <A HREF="#Instruction"> Instructions and Opcodes </A> <BR>
+<UL>
+<LI> <A HREF="#Main"> Main instructions </A> <BR>
+<LI> <A HREF="#Co"> Co-Processor instructions </A> <BR>
+<LI> <A HREF="#Cond"> Condition Codes </A> <BR>
+<LI> <A HREF="#FpuCond"> Condition Codes for FCMOVcc </A> <BR>
+</UL> 
+<LI> <A HREF="#Futher"> Further Reading </A> <BR>
+</UL>
+
+<A NAME="Technical"> <HR> </A>
+<H2>Technical Specifications</H2>
+<TABLE BORDER>
+<TR><TH></TH>
+<TH>Introduction<BR>
+Date</TH>
+<TH>Clock Speeds</TH>
+<TH>Bus Width</TH>
+<TH>Number of<BR>
+Transistors</TH>
+<TH>Addressable<BR>
+Memory</TH>
+<TH>Virtual<BR>
+Memory</TH>
+<TH>Brief<BR>
+Description</TH></TR>
+<TR>
+<TD ALIGN=CENTER><B>4004</B><TD ALIGN=CENTER>11/15/71</TD><TD ALIGN=CENTER>108 KHz</TD><TD ALIGN=CENTER>4 bits</TD><TD ALIGN=CENTER>2,300<BR>(10 microns)</TD><TD ALIGN=CENTER>640 bytes</TD><TD><BR></TD><TD ALIGN=CENTER>First microcomputer chip,<BR>Arithme
+tic manipulation</TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>8008</B></TD>
+<TD ALIGN=CENTER>4/1/72</TD><TD ALIGN=CENTER>108 KHz</TD><TD ALIGN=CENTER>8 bits</TD><TD ALIGN=CENTER>3,500</TD><TD ALIGN=CENTER>16 KBytes</TD><TD ALIGN=CENTER><BR></TD><TD ALIGN=CENTER>Data/character manipulation</TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>8080</B></TD>
+<TD ALIGN=CENTER>4/1/74</TD><TD ALIGN=CENTER>2 MHz</TD><TD ALIGN=CENTER>8 bits</TD><TD ALIGN=CENTER>6,000<BR>(6 microns)</TD><TD ALIGN=CENTER>64 KBytes</TD><TD ALIGN=CENTER><BR>
+</TD><TD ALIGN=CENTER>10X the performance of the 8008</TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>8086</B></TD>
+<TD ALIGN=CENTER>6/8/78</TD>
+<TD ALIGN=CENTER>5 MHz<BR> 8 MHz<BR> 10 MHz</TD><TD ALIGN=CENTER>16 bits</TD><TD ALIGN=CENTER>29,000<BR>(3 microns)</TD><TD ALIGN=CENTER>1 Megabyte</TD>
+<TD><BR></TD><TD ALIGN=CENTER>10X the performance of the 8080</TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>8088</B></TD>
+<TD ALIGN=CENTER>6/1/79</TD><TD ALIGN=CENTER>5 MHz<BR> 8 MHz</TD><TD ALIGN=CENTER>8 bits</TD><TD ALIGN=CENTER>29,000<BR>(3 microns)</TD><TD ALIGN=CENTER><BR></TD><TD ALIGN=CENTER><BR></TD><TD ALIGN=CENTER>Identical to 8086 except for its 8-bit external bu
+s</TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>80286</B></TD>
+<TD ALIGN=CENTER>2/1/82</TD><TD ALIGN=CENTER>8 MHz<BR> 10 MHz<BR> 12 MHz</TD><TD ALIGN=CENTER>16 bits</TD><TD ALIGN=CENTER>134,000<BR>(1.5 microns)</TD><TD ALIGN=CENTER>16 Megabytes</TD><TD ALIGN=CENTER>1 gigabyte</TD><TD ALIGN=CENTER>3-6X the performance
+ of the 8086</TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>Intel386<FONT SIZE=2>(TM)</FONT>DX Microprocessor</B></TD>
+<TD ALIGN=CENTER>10/17/85</TD><TD ALIGN=CENTER>16 MHz<BR>20 MHz<BR>25 MHz<BR>33 MHz</TD><TD ALIGN=CENTER>32 bits</TD><TD ALIGN=CENTER>275,000<BR>(1 micron)</TD><TD ALIGN=CENTER>4 gigabytes</TD><TD ALIGN=CENTER>64 terabytes
+</TD><TD ALIGN=CENTER>First X86 chip to handle 32-bit data sets<BR></TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>Intel386<FONT SIZE=2>(TM)</FONT>SX Microprocessor</TD>
+<TD ALIGN=CENTER>6/16/88</TD><TD ALIGN=CENTER>16 MHz<BR>20 MHz</TD><TD ALIGN=CENTER>16 bits</TD><TD ALIGN=CENTER>275,000<BR>(1 micron)</TD><TD ALIGN=CENTER>4 gigabytes</TD><TD ALIGN=CENTER>64 terabytes</TD><TD ALIGN=CENTER>16-bit address bus enabled low-c
+ost 32-bit processing
+<BR></TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>Intel486<FONT SIZE=2>(TM)</FONT>DX Microprocessor</B></TD>
+<TD ALIGN=CENTER>4/10/89</TD><TD ALIGN=CENTER>25 MHz<BR>33 MHz<BR>50 MHz</TD><TD ALIGN=CENTER>32 bits</TD><TD ALIGN=CENTER>1,200,000<BR>(1 micron, .8 micron with 50 MHz)</TD><TD ALIGN=CENTER>4 gigabytes</TD><TD ALIGN=CENTER>64 terabytes</TD><TD ALIGN=CENT
+ER>Level 1 cache on chip
+<BR></TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>Intel486<FONT SIZE=2>(TM)</FONT>SX Microprocessor</B></TD>
+<TD ALIGN=CENTER>4/22/91</TD><TD ALIGN=CENTER>16 MHz<BR>20 MHz<BR>25 MHz<BR>33 MHz</TD><TD ALIGN=CENTER>32 bits</TD><TD ALIGN=CENTER>1,185,000<BR>(.8 micron)</TD><TD ALIGN=CENTER>4 gigabytes</TD><TD ALIGN=CENTER>64 terabytes</TD><TD ALIGN=CENTER>identical
+ in design to Intel486(TM) DX but without math coprocessor<BR></TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>Pentium&#174; Processor</B></TD>
+<TD ALIGN=CENTER>3/22/93</TD><TD ALIGN=CENTER>60MHz<BR>66MHz<BR>75MHz<BR>90MHz<BR>100MHz<BR>120MHz<BR>133MHz<BR>150MHz<BR>166MHz</TD><TD ALIGN=CENTER>32 bits</TD><TD ALIGN=CENTER>3.1 million<BR>(.8 micron)</TD><TD ALIGN=CENTER>4 gigabytes</TD><TD ALIGN=CE
+NTER>64 terabytes</TD><TD ALIGN=CENTER>superscaler architecture brought 5X the performance of the 33-MHz Intel486 DX
+processor<BR></TD></TR>
+<TR>
+<TD ALIGN=CENTER><B>Pentium&#174; Pro Processor</B></TD>
+<TD ALIGN=CENTER>3/27/95</TD><TD ALIGN=CENTER>150MHz<BR>180MHz<BR>200MHz</TD><TD ALIGN=CENTER>32 bits</TD><TD ALIGN=CENTER>5.5 million<BR>(.32 micron)</TD><TD ALIGN=CENTER>4 gigabytes</TD><TD ALIGN=CENTER>64 terabytes</TD><TD ALIGN=CENTER>dynamic executio
+n architecture drives high-performing processor
+<BR></TD></TR>
+</TABLE>
+</CENTER>
+<P><br>
+
+
+<A NAME="Instruction"> <HR> </A>
+<H2> Instructions and opcodes </H2>
+<P>
+<STRONG> oo : Function </STRONG> <BR>
+<UL>
+<LI> 00 : If mmm = 110, then a displacement follows the operation; otherwise, no displacement is used <BR>
+<LI> 01 : An 8-bit signed displacement follows the opcode <BR>
+<LI> 10 : A 16-bit signed displacement follows the opcode <BR>
+<LI> 11 : mmm specifies a register, instead of an addressing mode <BR>
+</UL>
+
+<STRONG> mmm : Function </STRONG> <BR>
+<UL>
+<LI> 000 : DS:[BX+SI] <BR>
+<LI> 001 : DS:[BX+DI] <BR>
+<LI> 010 : SS:[BP+SI] <BR>
+<LI> 011 : SS:[BP+DI] <BR>
+<LI> 100 : DS:[SI] <BR>
+<LI> 101 : DS:[DI] <BR>
+<LI> 110 : SS:[BP] <BR>
+<LI> 111 : DS:[BX] <BR>
+</UL>
+
+<STRONG> rrr : W=0 : W=1 : reg32 </STRONG> <BR>
+<UL>
+<LI> 000 : AL : AX : EAX <BR>
+<LI> 001 : CL : CX : ECX <BR>
+<LI> 010 : DL : DX : EDX <BR>
+<LI> 011 : BL : BX : EBX <BR>
+<LI> 100 : AH : SP : ESP <BR>
+<LI> 101 : CH : BP : EBP <BR>
+<LI> 110 : DH : SI : ESI <BR>
+<LI> 111 : BH : DI : EDI <BR>
+</UL>
+
+<STRONG> sss : Segment Register </STRONG> <BR>
+<UL>
+<LI> 000 : ES <BR>
+<LI> 001 : CS <BR>
+<LI> 010 : SS <BR>
+<LI> 011 : DS <BR>
+<LI> 100 : FS (Only 386+)
+<LI> 101 : GS (Only 386+)
+</UL>
+
+<STRONG> rrr : Index Register </STRONG <BR>
+<UL>
+<LI> 000 : EAX <BR>
+<LI> 001 : ECX <BR>
+<LI> 010 : EDX <BR>
+<LI> 011 : EBX <BR>
+<LI> 100 : No Index <BR>
+<LI> 101 : EBP <BR>
+<LI> 110 : ESI <BR>
+<LI> 111 : EDI <BR>
+</UL>
+
+<STRONG> 32 bit addressing-mode </STRONG> <BR>
+<TABLE BORDER=all  CELLSPACING=1 CELLPADDING=4 COLS=5 WIDTH=100%>
+<COLW COL=2-5 WIDTH=3>
+<HSPEC COL=1 ALIGN=char CHAR="-">
+
+<TR>
+<TH>oo
+<TH>mmm
+<TH>rrr
+<TH>Description
+
+<TR>
+<TD>00
+<TD>000
+<TD>&nbsp;
+<TD>DS:[EAX]
+
+<TR>
+<TD>00
+<TD>001
+<TD>&nbsp;
+<TD>DS:[ECX]
+
+<TR>
+<TD>00
+<TD>010
+<TD>&nbsp;
+<TD>DS:[EDX]
+
+<TR>
+<TD>00
+<TD>011
+<TD>&nbsp;
+<TD>DS:[EBX]
+
+<TR>
+<TD>00
+<TD>100
+<TD>000
+<TD>DS:[EAX+scaled_index]
+
+<TR>
+<TD>00
+<TD>100
+<TD>001
+<TD>DS:[ECX+scaled_index]
+
+<TR>
+<TD>00
+<TD>100
+<TD>010
+<TD>DS:[EDX+scaled_index]
+
+<TR>
+<TD>00
+<TD>100
+<TD>011
+<TD>DS:[EBX+scaled_index]
+
+<TR>
+<TD>00
+<TD>100
+<TD>100
+<TD>SS:[ESP+scaled_index]
+
+<TR>
+<TD>00
+<TD>100
+<TD>101
+<TD>DS:[disp32+scaled_index]
+
+<TR>
+<TD>00
+<TD>100
+<TD>110
+<TD>DS:[ESI+scaled_index]
+
+<TR>
+<TD>00
+<TD>100
+<TD>111
+<TD>DS:[EDI+scaled_index]
+
+<TR>
+<TD>00
+<TD>101
+<TD>&nbsp;
+<TD>DS:disp32
+
+<TR>
+<TD>00
+<TD>110
+<TD>&nbsp;
+<TD>DS:[ESI]
+
+<TR>
+<TD>00
+<TD>111
+<TD>&nbsp;
+<TD>DS:[EDI]
+
+<TR>
+<TD>01
+<TD>000
+<TD>&nbsp;
+<TD>DS:[EAX+disp8]
+
+<TR>
+<TD>01
+<TD>001
+<TD>&nbsp;
+<TD>DS:[ECX+disp8]
+
+<TR>
+<TD>01
+<TD>010
+<TD>&nbsp;
+<TD>DS:[EDX+disp8]
+
+<TR>
+<TD>01
+<TD>011
+<TD>&nbsp;
+<TD>DS:[EBX+disp8]
+
+<TR>
+<TD>01
+<TD>100
+<TD>000
+<TD>DS:[EAX+scaled_index+disp8]
+
+<TR>
+<TD>01
+<TD>100
+<TD>001
+<TD>DS:[ECX+scaled_index+disp8]
+
+<TR>
+<TD>01
+<TD>100
+<TD>010
+<TD>DS:[EDX+scaled_index+disp8]
+
+<TR>
+<TD>01
+<TD>100
+<TD>011
+<TD>DS:[EBX+scaled_index+disp8]
+
+<TR>
+<TD>01
+<TD>100
+<TD>100
+<TD>SS:[ESP+scaled_index+disp8]
+
+<TR>
+<TD>01
+<TD>100
+<TD>101
+<TD>SS:[EBP+scaled_index+disp8]
+
+<TR>
+<TD>01
+<TD>100
+<TD>110
+<TD>DS:[ESI+scaled_index+disp8]
+
+<TR>
+<TD>01
+<TD>100
+<TD>111
+<TD>DS:[EDI+scaled_index+disp8]
+
+<TR>
+<TD>01
+<TD>101
+<TD>&nbsp;
+<TD>SS:[EBP+disp8]
+
+<TR>
+<TD>01
+<TD>110
+<TD>&nbsp;
+<TD>DS:[ESI+disp8]
+
+<TR>
+<TD>01
+<TD>111
+<TD>&nbsp;
+<TD>DS:[EDI+disp8]
+
+<TR>
+<TD>10
+<TD>000
+<TD>&nbsp;
+<TD>DS:[EAX+disp32]
+
+<TR>
+<TD>10
+<TD>001
+<TD>&nbsp;
+<TD>DS:[ECX+disp32]
+
+<TR>
+<TD>10
+<TD>010
+<TD>&nbsp;
+<TD>DS:[EDX+disp32]
+
+<TR>
+<TD>10
+<TD>011
+<TD>&nbsp;
+<TD>DS:[EBX+disp32]
+
+<TR>
+<TD>10
+<TD>100
+<TD>000
+<TD>DS:[EAX+scaled_index+disp32]
+
+<TR>
+<TD>10
+<TD>100
+<TD>001
+<TD>DS:[ECX+scaled_index+disp32]
+
+<TR>
+<TD>10
+<TD>100
+<TD>010
+<TD>DS:[EDX+scaled_index+disp32]
+
+<TR>
+<TD>10
+<TD>100
+<TD>011
+<TD>DS:[EBX+scaled_index+disp32]
+
+<TR>
+<TD>10
+<TD>100
+<TD>100
+<TD>SS:[ESP+scaled_index+disp32]
+
+<TR>
+<TD>10
+<TD>100
+<TD>101
+<TD>SS:[EBP+scaled_index+disp32]
+
+<TR>
+<TD>10
+<TD>100
+<TD>110
+<TD>DS:[ESI+scaled_index+disp32]
+
+<TR>
+<TD>10
+<TD>100
+<TD>111
+<TD>DS:[EDI+scaled_index+disp32]
+
+<TR>
+<TD>10
+<TD>101
+<TD>&nbsp;
+<TD>SS:[EBP+disp32]
+
+<TR>
+<TD>10
+<TD>110
+<TD>&nbsp;
+<TD>DS:[ESI+disp32]
+
+<TR>
+<TD>10
+<TD>111
+<TD>&nbsp;
+<TD>DS:[EDI+disp32]
+
+
+</TABLE>
+<BR>
+
+<P>
+<A NAME="Main"> <HR> </A>
+<H3> Main Instructions </H3> <BR>
+<BR>
+<A HREF="#HA">A</A> || 
+<A HREF="#HB">B</A> || 
+<A HREF="#HC">C</A> || 
+<A HREF="#HD">D</A> || 
+<A HREF="#HE">E</A> || 
+<A HREF="#HH">H</A> || 
+<A HREF="#HI">I</A> || 
+<A HREF="#HJ">J</A> || 
+<A HREF="#HL">L</A> || 
+<A HREF="#HM">M</A> || 
+<A HREF="#HN">N</A> || 
+<A HREF="#HO">O</A> || 
+<A HREF="#HP">P</A> || 
+<A HREF="#HR">R</A> || 
+<A HREF="#HS">S</A> || 
+<A HREF="#HT">T</A> || 
+<A HREF="#HV">V</A> || 
+<A HREF="#HW">W</A> || 
+<A HREF="#HX">X</A><BR>
+<P>
+
+<TABLE BORDER=all  CELLSPACING=1 CELLPADDING=4 COLS=5 WIDTH=100%>
+<COLW COL=2-5 WIDTH=3>
+<HSPEC COL=1 ALIGN=char CHAR="-">
+
+<TR>
+<TH>Name
+<TH>Regs
+<TH>Opcode
+<TH>Proc
+<TH>Description
+<TR>
+<TD><A NAME="HA">AAA</A>
+<TD>&nbsp;
+<TD>00110111
+<TD>8086
+<TD>ASCII Adjust After Addition
+
+<TR>
+<TD>AAD
+<TD>Imm8
+<TD>11010101
+<TD>Pentium
+<TD>ASCII Adjust Register AX Before Division
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101010100001010
+<TD>8086
+<TD>ASCII Adjust Register AX Before Division
+
+<TR>
+<TD>AAM
+<TD>Imm8
+<TD>11010100
+<TD>Pentium
+<TD>ASCII Adjust AX Register After Multiplication
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101010000001010
+<TD>8086
+<TD>ASCII Adjust AX Register After Multiplication
+
+<TR>
+<TD>AAS
+<TD>&nbsp;
+<TD>00111111
+<TD>8086
+<TD>ASCII Adjust AL Register After Substraction
+
+<TR>
+<TD>ADC
+<TD>Reg,Reg
+<TD>0001001woorrrmmm
+<TD>8086
+<TD>Add Integers with Carry
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>0001000woorrrmmm
+<TD>8086
+<TD>Add Integers with Carry
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>0001001woorrrmmm
+<TD>8086
+<TD>Add Integers with Carry
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,Imm
+<TD>0001010w
+<TD>8086
+<TD>Add Integers with Carry
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1000001woo010mmm
+<TD>8086
+<TD>Add Integers with Carry
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1000001woo010mmm
+<TD>8086
+<TD>Add Integers with Carry
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm
+<TD>1000000woo010mmm
+<TD>8086
+<TD>Add Integers with Carry
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm
+<TD>1000000woo010mmm
+<TD>8086
+<TD>Add Integers with Carry
+
+<TR>
+<TD>ADD
+<TD>Reg,Reg
+<TD>0000001woorrrmmm
+<TD>8086
+<TD>Add Integers
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>0000000woorrrmmm
+<TD>8086
+<TD>Add Integers
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>0000001woorrrmmm
+<TD>8086
+<TD>Add Integers
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,Imm
+<TD>0000010w
+<TD>8086
+<TD>Add Integers
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1000001woo000mmm
+<TD>8086
+<TD>Add Integers
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1000001woo000mmm
+<TD>8086
+<TD>Add Integers
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm
+<TD>1000000woo000mmm
+<TD>8086
+<TD>Add Integers
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm
+<TD>1000000woo000mmm
+<TD>8086
+<TD>Add Integers
+
+<TR>
+<TD>AND
+<TD>Reg,Reg
+<TD>0010001woorrrmmm
+<TD>8086
+<TD>Logical AND
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>0010000woorrrmmm
+<TD>8086
+<TD>Logical AND
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>0010001woorrrmmm
+<TD>8086
+<TD>Logical AND
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,Imm
+<TD>0010010w
+<TD>8086
+<TD>Logical AND
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1000001woo100mmm
+<TD>8086
+<TD>Logical AND
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1000001woo100mmm
+<TD>8086
+<TD>Logical AND
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm
+<TD>1000000woo100mmm
+<TD>8086
+<TD>Logical AND
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm
+<TD>1000000woo100mmm
+<TD>8086
+<TD>Logical AND
+
+<TR>
+<TD>ARPL
+<TD>Reg16,Reg16
+<TD>01100011oorrrmmm
+<TD>80286
+<TD>Adjust Requester Privilege Level of Selector
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16,Reg16
+<TD>01100011oorrrmmm
+<TD>80286
+<TD>Adjust Requester Privilege Level of Selector
+
+<TR>
+<TD><A NAME="HB">BOUND</A>
+<TD>Reg16,Mem32
+<TD>01100010oorrrmmm
+<TD>80186
+<TD>Check Array Index Against Bounds
+
+<TR>
+<TD>&nbsp;
+<TD>Reg32,Mem64
+<TD>01100010oorrrmmm 
+<TD>80386
+<TD>Check Array Index Against Bounds
+
+<TR>
+<TD>BSF
+<TD>RegWord,RegWord
+<TD>0000111110111100oorrrmmm
+<TD>80386
+<TD>Bit Scan Forward
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,MemWord
+<TD>0000111110111100oorrrmmm
+<TD>80386
+<TD>Bit Scan Forward
+
+<TR>
+<TD>BSR
+<TD>RegWord,RegWord
+<TD>0000111110111101oorrrmmm
+<TD>80386
+<TD>Bit Scan Reverse
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,MemWord
+<TD>0000111110111101oorrrmmm
+<TD>80386
+<TD>Bit Scan Reverse
+
+<TR>
+<TD>BSWAP
+<TD>RegWord
+<TD>0000111111001rrr
+<TD>80486
+<TD>Byte swap
+
+<TR>
+<TD>BT
+<TD>RegWord,Imm8
+<TD>0000111110111010oo100mmm
+<TD>80386
+<TD>Bit Test
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,Imm8
+<TD>0000111110111010oo100mmm
+<TD>80386
+<TD>Bit Test
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,RegWord
+<TD>0000111110100011oorrrmmm
+<TD>80386
+<TD>Bit Test
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,RegWord
+<TD>0000111110100011oorrrmmm
+<TD>80386
+<TD>Bit Test
+
+<TR>
+<TD>BTC
+<TD>RegWord,Imm8
+<TD>0000111110111010oo111mmm
+<TD>80386
+<TD>Bit Test and Complement
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,Imm8
+<TD>0000111110111010oo111mmm
+<TD>80386
+<TD>Bit Test and Complement
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,RegWord
+<TD>0000111110111011oorrrmmm
+<TD>80386
+<TD>Bit Test and Complement
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,RegWord
+<TD>0000111110111011oorrrmmm
+<TD>80386
+<TD>Bit Test and Complement
+
+<TR>
+<TD>BTR
+<TD>RegWord,Imm8
+<TD>0000111110111010oo110mmm
+<TD>80386
+<TD>Bit Test and Reset
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,Imm8
+<TD>0000111110111010oo110mmm
+<TD>80386
+<TD>Bit Test and Reset
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,RegWord
+<TD>0000111110110011oorrrmmm
+<TD>80386
+<TD>Bit Test and Reset
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,RegWord
+<TD>0000111110110011oorrrmmm
+<TD>80386
+<TD>Bit Test and Reset
+
+<TR>
+<TD>BTS
+<TD>RegWord,Imm8
+<TD>0000111110111010oo101mmm
+<TD>80386
+<TD>Bit Test and Set
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,Imm8
+<TD>0000111110111010oo101mmm
+<TD>80386
+<TD>Bit Test and Set
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,RegWord
+<TD>0000111110101011oorrrmmm
+<TD>80386
+<TD>Bit Test and Set
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,RegWord
+<TD>0000111110101011oorrrmmm
+<TD>80386
+<TD>Bit Test and Set
+
+<TR>
+<TD><A NAME="HC">CBW</A>
+<TD>&nbsp;
+<TD>10011000
+<TD>8086
+<TD>Convert Byte to Word
+
+<TR>
+<TD>CDQ
+<TD>&nbsp;
+<TD>10011001 
+<TD>80386
+<TD>Convert Doubleword to Quad-Word
+
+<TR>
+<TD>CLC
+<TD>&nbsp;
+<TD>11111000
+<TD>8086
+<TD>Clear Carry Flag (CF)
+
+<TR>
+<TD>CLD
+<TD>&nbsp;
+<TD>11111100
+<TD>8086
+<TD>Clear Direction Flag (DF)
+
+<TR>
+<TD>CLI
+<TD>&nbsp;
+<TD>11111010
+<TD>8086
+<TD>Clear Interrupt Flag (IF)
+
+<TR>
+<TD>CLTS
+<TD>&nbsp;
+<TD>0000111100000110
+<TD>80286
+<TD>Clear Task-Switched Flag in Control Register Zero
+
+<TR>
+<TD>CMC
+<TD>&nbsp;
+<TD>11110101
+<TD>8086
+<TD>Complementer Carry Flag (CF)
+
+<TR>
+<TD>CMOVcc
+<TD>Reg,Reg
+<TD>000011110100ccccoorrrmmm
+<TD>PentiumPro
+<TD>Conditional Move 
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>000011110100ccccoorrrmmm
+<TD>PentiumPro
+<TD>Conditional Move 
+
+<TR>
+<TD>CMP
+<TD>Reg,Reg
+<TD>0011101woorrrmmm
+<TD>8086
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>0011100woorrrmmm
+<TD>8086
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>0011101woorrrmmm
+<TD>8086
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,Imm
+<TD>0011110w
+<TD>8086
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1000001woo111mmm
+<TD>8086
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1000001woo111mmm
+<TD>8086
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm
+<TD>1000000woo111mmm
+<TD>8086
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm
+<TD>1000000woo111mmm
+<TD>8086
+<TD>Compare
+
+<TR>
+<TD>CMPSB
+<TD>&nbsp;
+<TD>10100110
+<TD>8086
+<TD>Compare String - Byte
+
+<TR>
+<TD>CMPSW
+<TD>&nbsp;
+<TD>10100111
+<TD>8086
+<TD>Compare String - Word
+
+<TR>
+<TD>CMPSD
+<TD>&nbsp;
+<TD>10100111 
+<TD>80386
+<TD>Compare String - Doubleword
+
+<TR>
+<TD>CMPXCHG
+<TD>Reg,Reg
+<TD>000011111011000woorrrmmm
+<TD>80486
+<TD>Compare and Exchange
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>000011111011000woorrrmmm
+<TD>80486
+<TD>Compare and Exchange
+
+<TR>
+<TD>CMPXCHG8B
+<TD>Mem64
+<TD>0000111111000111oo001mmm
+<TD>Pentium
+<TD>Compare and Exchange 8 Bytes
+
+<TR>
+<TD>CPUID
+<TD>&nbsp;
+<TD>0000111110100010
+<TD>Pentium
+<TD>CPU Identification code to EAX
+
+<TR>
+<TD>CWD
+<TD>&nbsp;
+<TD>10011001
+<TD>8086
+<TD>Convert Word to Doubleword
+
+<TR>
+<TD>CWDE
+<TD>&nbsp;
+<TD>10011000 
+<TD>80386
+<TD>Convert Word to Extended Doubleword
+
+<TR>
+<TD><A NAME="HD">DAA</A>
+<TD>&nbsp;
+<TD>00100111
+<TD>8086
+<TD>Decimal Adjust Register After Addition
+
+<TR>
+<TD>DAS
+<TD>&nbsp;
+<TD>00101111
+<TD>8086
+<TD>Decimal Adjust AL Register After Substraction
+
+<TR>
+<TD>DEC
+<TD>RegWord
+<TD>01001rrr
+<TD>8086
+<TD>Decrement by One
+
+<TR>
+<TD>&nbsp;
+<TD>Reg
+<TD>1111111woo001mmm
+<TD>8086
+<TD>Decrement by One
+
+<TR>
+<TD>&nbsp;
+<TD>Mem
+<TD>1111111woo001mmm
+<TD>8086
+<TD>Decrement by One
+
+<TR>
+<TD>DIV
+<TD>Reg
+<TD>1111011woo110mmm
+<TD>8086
+<TD>Unsigned Integer Divide
+
+<TR>
+<TD>&nbsp;
+<TD>Mem
+<TD>1111011woo110mmm
+<TD>8086
+<TD>Unsigned Integer Divide
+
+<TR>
+<TD><A NAME="HE">ENTER</A>
+<TD>Imm16,Imm8
+<TD>11001000
+<TD>80186
+<TD>Make Stack Frame for Procedure Parameter
+
+<TR>
+<TD><A NAME="HH">HLT</A>
+<TD>&nbsp;
+<TD>11110100
+<TD>8086
+<TD>Halt
+
+<TR>
+<TD><A NAME="HI">IDIV</A>
+<TD>Reg
+<TD>1111011woo111mmm
+<TD>8086
+<TD>Signed Divide
+
+<TR>
+<TD>&nbsp;
+<TD>Mem
+<TD>1111011woo111mmm
+<TD>8086
+<TD>Signed Divide
+
+<TR>
+<TD>IMUL
+<TD>RegWord,RegWord,Imm8
+<TD>01101011oorrrmmm
+<TD>80186
+<TD>Signed Integer Multiply
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,MemWord,Imm8
+<TD>01101011oorrrmmm
+<TD>80186
+<TD>Signed Integer Multiply
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,RegWord,Imm
+<TD>01101001oorrrmmm
+<TD>80186
+<TD>Signed Integer Multiply
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,MemWord,Imm
+<TD>01101001oorrrmmm
+<TD>80186
+<TD>Signed Integer Multiply
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,Imm8
+<TD>0110101111rrrqqq
+<TD>80186
+<TD>Signed Integer Multiply
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,Imm
+<TD>0110100111rrrqqq
+<TD>80186
+<TD>Signed Integer Multiply
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,RegWord
+<TD>0000111110101111oorrrmmm
+<TD>80386
+<TD>Signed Integer Multiply
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,MemWord
+<TD>0000111110101111oorrrmmm
+<TD>80386
+<TD>Signed Integer Multiply
+
+<TR>
+<TD>&nbsp;
+<TD>Reg
+<TD>1111011woo101mmm
+<TD>8086
+<TD>Signed Integer Multiply
+
+<TR>
+<TD>&nbsp;
+<TD>Mem
+<TD>1111011woo101mmm
+<TD>8086
+<TD>Signed Integer Multiply
+
+<TR>
+<TD>IN
+<TD>Acc,Imm8
+<TD>1110010w
+<TD>8086
+<TD>Input from Port
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,DX
+<TD>1110110w
+<TD>8086
+<TD>Input from Port
+
+<TR>
+<TD>INC
+<TD>RegWord
+<TD>01000rrr
+<TD>8086
+<TD>Increment by 1
+
+<TR>
+<TD>&nbsp;
+<TD>Reg
+<TD>1111111woo000mmm
+<TD>8086
+<TD>Increment by 1
+
+<TR>
+<TD>&nbsp;
+<TD>Mem
+<TD>1111111woo000mmm
+<TD>8086
+<TD>Increment by 1
+
+<TR>
+<TD>INSB
+<TD>&nbsp;
+<TD>01101100
+<TD>80186
+<TD>Input Byte
+
+<TR>
+<TD>INSW
+<TD>&nbsp;
+<TD>01101101
+<TD>80186
+<TD>Input Word
+
+<TR>
+<TD>INSD
+<TD>&nbsp;
+<TD>01101101 
+<TD>80386
+<TD>Input DoubleWord
+
+<TR>
+<TD>INT
+<TD>3
+<TD>11001100
+<TD>8086
+<TD>Call to Interrupt Procedure
+
+<TR>
+<TD>&nbsp;
+<TD>Imm8
+<TD>11001101
+<TD>8086
+<TD>Call to Interrupt Procedure
+
+<TR>
+<TD>INTO
+<TD>&nbsp;
+<TD>11001110
+<TD>8086
+<TD>Interrupt on Overflow
+
+<TR>
+<TD>INVD
+<TD>&nbsp;
+<TD>0000111100001000
+<TD>80486
+<TD>Invalidate data cache
+
+<TR>
+<TD>INVLPG
+<TD>Mem
+<TD>0000111100000001oo111mmm
+<TD>80486
+<TD>Invalidate TBL entry
+
+<TR>
+<TD>IRET
+<TD>&nbsp;
+<TD>11001111
+<TD>8086
+<TD>Return from Interrupt
+
+<TR>
+<TD>IRETD
+<TD>&nbsp;
+<TD>11001111 
+<TD>80386
+<TD>Return from Interrupt - 32-bit Mode
+
+<TR>
+<TD><A NAME="HL">LAHF</A>
+<TD>&nbsp;
+<TD>10011111
+<TD>8086
+<TD>Load Flags into AH Register
+
+<TR>
+<TD>LAR
+<TD>RegWord,RegWord
+<TD>0000111100000010oorrrmmm
+<TD>80286
+<TD>Load Access Rights Byte
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,MemWord
+<TD>0000111100000010oorrrmmm
+<TD>80286
+<TD>Load Access Rights Byte
+
+<TR>
+<TD>LDS
+<TD>Reg16,Mem32
+<TD>11000101oorrrmmm
+<TD>8086
+<TD>Load Pointer Using DS
+
+<TR>
+<TD>&nbsp;
+<TD>Reg32,Mem64
+<TD>11000101oorrrmmm 
+<TD>80386
+<TD>Load Pointer Using DS
+
+<TR>
+<TD>LES
+<TD>Reg16,Mem32
+<TD>11000100oorrrmmm
+<TD>8086
+<TD>Load Pointer Using ES
+
+<TR>
+<TD>&nbsp;
+<TD>Reg32,Mem64
+<TD>11000100oorrrmmm 
+<TD>80386
+<TD>Load Pointer Using ES
+
+<TR>
+<TD>LFS
+<TD>Reg16,Mem32
+<TD>0000111110110100oorrrmmm
+<TD>80386
+<TD>Load Pointer Using FS
+
+<TR>
+<TD>&nbsp;
+<TD>Reg32,Mem64
+<TD>0000111110110100oorrrmmm 
+<TD>80386
+<TD>Load Pointer Using FS
+
+<TR>
+<TD>LGS
+<TD>Reg16,Mem32
+<TD>0000111110110101oorrrmmm
+<TD>80386
+<TD>Load Pointer Using GS
+
+<TR>
+<TD>&nbsp;
+<TD>Reg32,Mem64
+<TD>0000111110110101oorrrmmm 
+<TD>80386
+<TD>Load Pointer Using GS
+
+<TR>
+<TD>LSS
+<TD>Reg16,Mem32
+<TD>0000111110110010oorrrmmm
+<TD>80386
+<TD>Load Pointer Using SS
+
+<TR>
+<TD>&nbsp;
+<TD>Reg32,Mem64
+<TD>0000111110110010oorrrmmm 
+<TD>80386
+<TD>Load Pointer Using SS
+
+<TR>
+<TD>LEA
+<TD>RegWord,Mem
+<TD>10001101oorrrmmm
+<TD>8086
+<TD>Load Effective Address
+
+<TR>
+<TD>LEAVE
+<TD>&nbsp;
+<TD>11001001
+<TD>80186
+<TD>High Level Procedure Exit
+
+<TR>
+<TD>LGDT
+<TD>Mem64
+<TD>0000111100000001oo010mmm
+<TD>80286
+<TD>Load Global Descriptor Table
+
+<TR>
+<TD>LIDT
+<TD>Mem64
+<TD>0000111100000001oo011mmm
+<TD>80286
+<TD>Load Interrupt Descriptor Table
+
+<TR>
+<TD>LLDT
+<TD>Reg16
+<TD>0000111100000000oo010mmm
+<TD>80286
+<TD>Load Local Descriptor Table
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>0000111100000000oo010mmm
+<TD>80286
+<TD>Load Local Descriptor Table
+
+<TR>
+<TD>LMSW
+<TD>Reg16
+<TD>0000111100000001oo110mmm
+<TD>80286
+<TD>Load Machine Status Word
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>0000111100000001oo110mmm
+<TD>80286
+<TD>Load Machine Status Word
+
+<TR>
+<TD>LODSB
+<TD>&nbsp;
+<TD>10101100
+<TD>8086
+<TD>Load Byte
+
+<TR>
+<TD>LODSW
+<TD>&nbsp;
+<TD>10101101
+<TD>8086
+<TD>Load Word
+
+<TR>
+<TD>LODSD
+<TD>&nbsp;
+<TD>10101101 
+<TD>80386
+<TD>Load Doubleword
+
+<TR>
+<TD>LSL
+<TD>RegWord,RegWord
+<TD>0000111100000011oorrrmmm
+<TD>80286
+<TD>Load Segment Limit
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,MemWord
+<TD>0000111100000011oorrrmmm
+<TD>80286
+<TD>Load Segment Limit
+
+<TR>
+<TD>LTR
+<TD>Reg16
+<TD>0000111100000000oo011mmm
+<TD>80286
+<TD>Load Task Register
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>0000111100000000oo011mmm
+<TD>80286
+<TD>Load Task Register
+
+<TR>
+<TD><A NAME="HM">MOV</A>
+<TD>MemOfs,Acc
+<TD>1010001w
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,MemOfs
+<TD>1010000w
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm
+<TD>1011wrrr
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm
+<TD>1100011woo000mmm
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Reg
+<TD>1000101woorrrmmm
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>1000101woorrrmmm
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>1000100woorrrmmm
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Reg16,Seg
+<TD>10001100oosssmmm
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Seg,Reg16
+<TD>10001110oosssmmm
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16,Seg
+<TD>10001100oosssmmm
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Seg,Mem16
+<TD>10001110oosssmmm
+<TD>8086
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Reg32,CRn
+<TD>000011110010000011sssrrr
+<TD>80386
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>CRn,Reg32
+<TD>000011110010001011sssrrr
+<TD>80386
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Reg32,DRn
+<TD>000011110010000111sssrrr
+<TD>80386
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>DRn,Reg32
+<TD>000011110010001111sssrrr
+<TD>80386
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>Reg32,TRn
+<TD>000011110010010011sssrrr
+<TD>80386
+<TD>Move Data
+
+<TR>
+<TD>&nbsp;
+<TD>TRn,Reg32
+<TD>000011110010011011sssrrr
+<TD>80386
+<TD>Move Data
+
+<TR>
+<TD>MOVSB
+<TD>&nbsp;
+<TD>10100100
+<TD>8086
+<TD>Move Byte
+
+<TR>
+<TD>MOVSW
+<TD>&nbsp;
+<TD>10100101
+<TD>8086
+<TD>Move Word
+
+<TR>
+<TD>MOVSD
+<TD>&nbsp;
+<TD>10100101 
+<TD>80386
+<TD>Move Doubleword
+
+<TR>
+<TD>MOVSX
+<TD>RegWord,Reg8
+<TD>0000111110111110oorrrmmm
+<TD>80386
+<TD>Move with Sign Extension
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,Mem8
+<TD>0000111110111110oorrrmmm
+<TD>80386
+<TD>Move with Sign Extension
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,Reg16
+<TD>0000111110111111oorrrmmm
+<TD>80386
+<TD>Move with Sign Extension
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,Mem16
+<TD>0000111110111111oorrrmmm
+<TD>80386
+<TD>Move with Sign Extension
+
+<TR>
+<TD>MOVZX
+<TD>RegWord,Reg8
+<TD>0000111110110110oorrrmmm
+<TD>80386
+<TD>Move with Zero Extension
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,Mem8
+<TD>0000111110110110oorrrmmm
+<TD>80386
+<TD>Move with Zero Extension
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,Reg16
+<TD>0000111110110111oorrrmmm
+<TD>80386
+<TD>Move with Zero Extension
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,Mem16
+<TD>0000111110110111oorrrmmm
+<TD>80386
+<TD>Move with Zero Extension
+
+<TR>
+<TD>MUL
+<TD>Reg
+<TD>1111011woo100mmm
+<TD>8086
+<TD>Unsigned Integer Multiply of AL, AX or EAX
+
+<TR>
+<TD>&nbsp;
+<TD>Mem
+<TD>1111011woo100mmm
+<TD>8086
+<TD>Unsigned Integer Multiply of AL, AX or EAX
+
+<TR>
+<TD><A NAME="HN">NEG</A>
+<TD>Reg
+<TD>1111011woo011mmm
+<TD>8086
+<TD>Negate(Two's Complement)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem
+<TD>1111011woo011mmm
+<TD>8086
+<TD>Negate(Two's Complement)
+
+<TR>
+<TD>NOP
+<TD>&nbsp;
+<TD>10010000
+<TD>8086
+<TD>No Operation
+
+<TR>
+<TD>NOT
+<TD>Reg
+<TD>1111011woo010mmm
+<TD>8086
+<TD>Negate(One's Complement)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem
+<TD>1111011woo010mmm
+<TD>8086
+<TD>Negate(One's Complement)
+
+<TR>
+<TD><A NAME="HO">OR</A>
+<TD>Reg,Reg
+<TD>0000101woorrrmmm
+<TD>8086
+<TD>Logical Inclusive OR
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>0000100woorrrmmm
+<TD>8086
+<TD>Logical Inclusive OR
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>0000101woorrrmmm
+<TD>8086
+<TD>Logical Inclusive OR
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,Imm
+<TD>0000110w
+<TD>8086
+<TD>Logical Inclusive OR
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1000001woo001mmm
+<TD>8086
+<TD>Logical Inclusive OR
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1000001woo001mmm
+<TD>8086
+<TD>Logical Inclusive OR
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm
+<TD>1000000woo001mmm
+<TD>8086
+<TD>Logical Inclusive OR
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm
+<TD>1000000woo001mmm
+<TD>8086
+<TD>Logical Inclusive OR
+
+<TR>
+<TD>OUT
+<TD>Imm8,Acc
+<TD>1110011w
+<TD>8086
+<TD>Output To Port
+
+<TR>
+<TD>&nbsp;
+<TD>DX,Acc
+<TD>1110111w
+<TD>8086
+<TD>Output To Port
+
+<TR>
+<TD>OUTSB
+<TD>&nbsp;
+<TD>01101110
+<TD>80186
+<TD>Output Byte
+
+<TR>
+<TD>OUTSW
+<TD>&nbsp;
+<TD>01101111
+<TD>80186
+<TD>Output Word
+
+<TR>
+<TD>OUTSD
+<TD>&nbsp;
+<TD>01101111 
+<TD>80386
+<TD>Output Doubleword
+
+<TR>
+<TD><A NAME="HP">POP</A>
+<TD>RegWord
+<TD>01011rrr
+<TD>8086
+<TD>Pop a Word from the Stack
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord
+<TD>10001111oo000mmm
+<TD>8086
+<TD>Pop a Word from the Stack
+
+<TR>
+<TD>&nbsp;
+<TD>SegOld
+<TD>00sss111
+<TD>8086
+<TD>Pop a Word from the Stack
+
+<TR>
+<TD>&nbsp;
+<TD>Seg
+<TD>0000111110sss001
+<TD>80386
+<TD>Pop a Word from the Stack
+
+<TR>
+<TD>POPA
+<TD>&nbsp;
+<TD>01100001
+<TD>80186
+<TD>POP All Registers
+
+<TR>
+<TD>POPAD
+<TD>&nbsp;
+<TD>01100001 
+<TD>80386
+<TD>POP All Registers - 32-bit Mode
+
+<TR>
+<TD>POPF
+<TD>&nbsp;
+<TD>10011101
+<TD>8086
+<TD>POP Stack into FLAGS
+
+<TR>
+<TD>POPFD
+<TD>&nbsp;
+<TD>10011101 
+<TD>80386
+<TD>POP Stack into EFLAGS
+
+<TR>
+<TD>PUSH
+<TD>RegWord
+<TD>01010rrr
+<TD>8086
+<TD>Push Operand onto Stack
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord
+<TD>11111111oo110mmm
+<TD>8086
+<TD>Push Operand onto Stack
+
+<TR>
+<TD>&nbsp;
+<TD>SegOld
+<TD>00sss110
+<TD>8086
+<TD>Push Operand onto Stack
+
+<TR>
+<TD>&nbsp;
+<TD>Seg
+<TD>0000111110sss000
+<TD>80386
+<TD>Push Operand onto Stack
+
+<TR>
+<TD>&nbsp;
+<TD>Imm8
+<TD>01101010
+<TD>80186
+<TD>Push Operand onto Stack
+
+<TR>
+<TD>&nbsp;
+<TD>Imm
+<TD>01101000
+<TD>80186
+<TD>Push Operand onto Stack
+
+<TR>
+<TD>PUSHW
+<TD>Imm16
+<TD>01101000
+<TD>80286
+<TD>PUSH Word
+
+<TR>
+<TD>PUSHD
+<TD>Imm32
+<TD>01101000 
+<TD>80386
+<TD>PUSH Double Word
+
+<TR>
+<TD>PUSHA
+<TD>&nbsp;
+<TD>01100000
+<TD>80186
+<TD>PUSH All Registers
+
+<TR>
+<TD>PUSHAD
+<TD>&nbsp;
+<TD>01100000 
+<TD>80386
+<TD>PUSH All Registers - 32-bit Mode
+
+<TR>
+<TD>PUSHF
+<TD>&nbsp;
+<TD>10011100
+<TD>8086
+<TD>PUSH FLAGS
+
+<TR>
+<TD>PUSHFD
+<TD>&nbsp;
+<TD>10011100 
+<TD>80386
+<TD>PUSH EFLAGS
+
+<TR>
+<TD><A NAME="HR">RCL</A>
+<TD>Reg,1
+<TD>1101000woo010mmm
+<TD>8086
+<TD>Rotate Left through Carry - Uses CF for Extension
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,1
+<TD>1101000woo010mmm
+<TD>8086
+<TD>Rotate Left through Carry - Uses CF for Extension
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,CL
+<TD>1101001woo010mmm
+<TD>8086
+<TD>Rotate Left through Carry - Uses CF for Extension
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,CL
+<TD>1101001woo010mmm
+<TD>8086
+<TD>Rotate Left through Carry - Uses CF for Extension
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1100000woo010mmm
+<TD>80186
+<TD>Rotate Left through Carry - Uses CF for Extension
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1100000woo010mmm
+<TD>80186
+<TD>Rotate Left through Carry - Uses CF for Extension
+
+<TR>
+<TD>RCR
+<TD>Reg,1
+<TD>1101000woo011mmm
+<TD>8086
+<TD>Rotate Right through Carry - Uses CF for Extension
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,1
+<TD>1101000woo011mmm
+<TD>8086
+<TD>Rotate Right through Carry - Uses CF for Extension
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,CL
+<TD>1101001woo011mmm
+<TD>8086
+<TD>Rotate Right through Carry - Uses CF for Extension
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,CL
+<TD>1101001woo011mmm
+<TD>8086
+<TD>Rotate Right through Carry - Uses CF for Extension
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1100000woo011mmm
+<TD>80186
+<TD>Rotate Right through Carry - Uses CF for Extension
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1100000woo011mmm
+<TD>80186
+<TD>Rotate Right through Carry - Uses CF for Extension
+
+<TR>
+<TD>RDMSR
+<TD>&nbsp;
+<TD>0000111100110010
+<TD>Pentium
+<TD>Read from Model Specific Register
+
+<TR>
+<TD>RDTSC
+<TD>&nbsp;
+<TD>0000111101010001
+<TD>Pentium
+<TD>Read Timwatamp Counter
+
+<TR>
+<TD>RET
+<TD>NEAR
+<TD>11000011
+<TD>8086
+<TD>Return from subprocedure
+
+<TR>
+<TD>RET
+<TD>imm NEAR
+<TD>11000010
+<TD>8086
+<TD>Return from subprocedure
+
+<TR>
+<TD>RET
+<TD>FAR
+<TD>11001011
+<TD>8086
+<TD>Return from subprocedure
+
+<TR>
+<TD>RET
+<TD>imm FAR
+<TD>11001010
+<TD>8086
+<TD>Return from subprocedure
+
+<TR>
+<TD>RDPMC
+<TD>&nbsp;
+<TD>0000111100110011
+<TD>PentiumPro
+<TD>Read Performance Monitor Counter
+
+<TR>
+<TD>ROL
+<TD>Reg,1
+<TD>1101000woo000mmm
+<TD>8086
+<TD>Rotate Left through Carry - Wrap bits around
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,1
+<TD>1101000woo000mmm
+<TD>8086
+<TD>Rotate Left through Carry - Wrap bits around
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,CL
+<TD>1101001woo000mmm
+<TD>8086
+<TD>Rotate Left through Carry - Wrap bits around
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,CL
+<TD>1101001woo000mmm
+<TD>8086
+<TD>Rotate Left through Carry - Wrap bits around
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1100000woo000mmm
+<TD>80186
+<TD>Rotate Left through Carry - Wrap bits around
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1100000woo000mmm
+<TD>80186
+<TD>Rotate Left through Carry - Wrap bits around
+
+<TR>
+<TD>ROR
+<TD>Reg,1
+<TD>1101000woo001mmm
+<TD>8086
+<TD>Rotate Right through Carry - Wrap bits around
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,1
+<TD>1101000woo001mmm
+<TD>8086
+<TD>Rotate Right through Carry - Wrap bits around
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,CL
+<TD>1101001woo001mmm
+<TD>8086
+<TD>Rotate Right through Carry - Wrap bits around
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,CL
+<TD>1101001woo001mmm
+<TD>8086
+<TD>Rotate Right through Carry - Wrap bits around
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1100000woo001mmm
+<TD>80186
+<TD>Rotate Right through Carry - Wrap bits around
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1100000woo001mmm
+<TD>80186
+<TD>Rotate Right through Carry - Wrap bits around
+
+<TR>
+<TD>RSM
+<TD>&nbsp;
+<TD>0000111110101010
+<TD>Pentium
+<TD>Return from System Management mode
+
+<TR>
+<TD><A NAME="HS">SALC</A>
+<TD>&nbsp;
+<TD>11010110
+<TD>Pentium Pro
+<TD>Set AL on Carry
+
+<TR>
+<TD>SAHF
+<TD>&nbsp;
+<TD>10011110
+<TD>8086
+<TD>Load Flags into AH Register
+
+<TR>
+<TD>SAL
+<TD>Reg,1
+<TD>1101000woo100mmm
+<TD>8086
+<TD>Shift Arithmetic Left
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,1
+<TD>1101000woo100mmm
+<TD>8086
+<TD>Shift Arithmetic Left
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,CL
+<TD>1101001woo100mmm
+<TD>8086
+<TD>Shift Arithmetic Left
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,CL
+<TD>1101001woo100mmm
+<TD>8086
+<TD>Shift Arithmetic Left
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1100000woo100mmm
+<TD>80186
+<TD>Shift Arithmetic Left
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1100000woo100mmm
+<TD>80186
+<TD>Shift Arithmetic Left
+
+<TR>
+<TD>SAR
+<TD>Reg,1
+<TD>1101000woo111mmm
+<TD>8086
+<TD>Shift Arithmetic Right
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,1
+<TD>1101000woo111mmm
+<TD>8086
+<TD>Shift Arithmetic Right
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,CL
+<TD>1101001woo111mmm
+<TD>8086
+<TD>Shift Arithmetic Right
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,CL
+<TD>1101001woo111mmm
+<TD>8086
+<TD>Shift Arithmetic Right
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1100000woo111mmm
+<TD>80186
+<TD>Shift Arithmetic Right
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1100000woo111mmm
+<TD>80186
+<TD>Shift Arithmetic Right
+
+<TR>
+<TD>SETcc
+<TD>Reg8
+<TD>000011111001ccccoo000mmm
+<TD>80386
+<TD>Set Byte on Condition Code
+
+<TR>
+<TD>&nbsp;
+<TD>Mem8
+<TD>000011111001ccccoo000mmm
+<TD>80386
+<TD>Set Byte on Condition Code
+
+<TR>
+<TD>SHL
+<TD>Reg,1
+<TD>1101000woo100mmm
+<TD>8086
+<TD>Shift Logic Left
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,1
+<TD>1101000woo100mmm
+<TD>8086
+<TD>Shift Logic Left
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,CL
+<TD>1101001woo100mmm
+<TD>8086
+<TD>Shift Logic Left
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,CL
+<TD>1101001woo100mmm
+<TD>8086
+<TD>Shift Logic Left
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1100000woo100mmm
+<TD>80186
+<TD>Shift Logic Left
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1100000woo100mmm
+<TD>80186
+<TD>Shift Logic Left
+
+<TR>
+<TD>SHR
+<TD>Reg,1
+<TD>1101000woo101mmm
+<TD>8086
+<TD>Shift Logic Right
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,1
+<TD>1101000woo101mmm
+<TD>8086
+<TD>Shift Logic Right
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,CL
+<TD>1101001woo101mmm
+<TD>8086
+<TD>Shift Logic Right
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,CL
+<TD>1101001woo101mmm
+<TD>8086
+<TD>Shift Logic Right
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1100000woo101mmm
+<TD>80186
+<TD>Shift Logic Right
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1100000woo101mmm
+<TD>80186
+<TD>Shift Logic Right
+
+<TR>
+<TD>SBB
+<TD>Reg,Reg
+<TD>0001101woorrrmmm
+<TD>8086
+<TD>Substract Integers with Borrow
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>0001100woorrrmmm
+<TD>8086
+<TD>Substract Integers with Borrow
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>0001101woorrrmmm
+<TD>8086
+<TD>Substract Integers with Borrow
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,Imm
+<TD>0001110w
+<TD>8086
+<TD>Substract Integers with Borrow
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1000001woo011mmm
+<TD>8086
+<TD>Substract Integers with Borrow
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1000001woo011mmm
+<TD>8086
+<TD>Substract Integers with Borrow
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm
+<TD>1000000woo011mmm
+<TD>8086
+<TD>Substract Integers with Borrow
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm
+<TD>1000000woo011mmm
+<TD>8086
+<TD>Substract Integers with Borrow
+
+<TR>
+<TD>SCASB
+<TD>&nbsp;
+<TD>10101110
+<TD>8086
+<TD>Compare Byte
+
+<TR>
+<TD>SCASW
+<TD>&nbsp;
+<TD>10101111
+<TD>8086
+<TD>Compare Word
+
+<TR>
+<TD>SCASD
+<TD>&nbsp;
+<TD>10101111 
+<TD>80386
+<TD>Compare Doubleword
+
+<TR>
+<TD>SGDT
+<TD>Mem64
+<TD>0000111100000001oo000mmm
+<TD>80286
+<TD>Store Global Descriptor Table
+
+<TR>
+<TD>SHLD
+<TD>RegWord,RegWord,Imm8
+<TD>0000111110100100oorrrmmm
+<TD>80386
+<TD>Double Precision Shift Left
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,RegWord,Imm8
+<TD>0000111110100100oorrrmmm
+<TD>80386
+<TD>Double Precision Shift Left
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,RegWord,CL
+<TD>0000111110100101oorrrmmm
+<TD>80386
+<TD>Double Precision Shift Left
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,RegWord,CL
+<TD>0000111110100101oorrrmmm
+<TD>80386
+<TD>Double Precision Shift Left
+
+<TR>
+<TD>SHRD
+<TD>RegWord,RegWord,Imm8
+<TD>0000111110101100oorrrmmm
+<TD>80386
+<TD>Double Precision Shift Right
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,RegWord,Imm8
+<TD>0000111110101100oorrrmmm
+<TD>80386
+<TD>Double Precision Shift Right
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,RegWord,CL
+<TD>0000111110101101oorrrmmm
+<TD>80386
+<TD>Double Precision Shift Right
+
+<TR>
+<TD>&nbsp;
+<TD>MemWord,RegWord,CL
+<TD>0000111110101101oorrrmmm
+<TD>80386
+<TD>Double Precision Shift Right
+
+<TR>
+<TD>SIDT
+<TD>Mem64
+<TD>0000111100000001oo001mmm
+<TD>80286
+<TD>Store Interrupt Descriptor Table
+
+<TR>
+<TD>SLDT
+<TD>Reg16
+<TD>0000111100000000oo000mmm
+<TD>80286
+<TD>Store Local Descriptor Table Register (LDTR)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>0000111100000000oo000mmm
+<TD>80286
+<TD>Store Local Descriptor Table Register (LDTR)
+
+<TR>
+<TD>SMSW
+<TD>Reg16
+<TD>0000111100000001oo100mmm
+<TD>80286
+<TD>Store Machine Status Word
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>0000111100000001oo100mmm
+<TD>80286
+<TD>Store Machine Status Word
+
+<TR>
+<TD>STC
+<TD>&nbsp;
+<TD>11111001
+<TD>8086
+<TD>Set Carry Flag(CF)
+
+<TR>
+<TD>STD
+<TD>&nbsp;
+<TD>11111101
+<TD>8086
+<TD>Set Direction Flag(DF)
+
+<TR>
+<TD>STI
+<TD>&nbsp;
+<TD>11111011
+<TD>8086
+<TD>Set Interrupt Flag(IF)
+
+<TR>
+<TD>STOSB
+<TD>&nbsp;
+<TD>10101010
+<TD>8086
+<TD>Store String Data Byte
+
+<TR>
+<TD>STOSW
+<TD>&nbsp;
+<TD>10101011
+<TD>8086
+<TD>Store String Data Word
+
+<TR>
+<TD>STOSD
+<TD>&nbsp;
+<TD>10101011 
+<TD>80386
+<TD>Store String Data DoubleWord
+
+<TR>
+<TD>STR
+<TD>Reg16
+<TD>0000111100000000oo001mmm
+<TD>80286
+<TD>Store Task Register
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>0000111100000000oo001mmm
+<TD>80286
+<TD>Store Task Register
+
+<TR>
+<TD>SUB
+<TD>Reg,Reg
+<TD>0010101woorrrmmm
+<TD>8086
+<TD>Subtract
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>0010100woorrrmmm
+<TD>8086
+<TD>Subtract
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>0010101woorrrmmm
+<TD>8086
+<TD>Subtract
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,Imm
+<TD>0010110w
+<TD>8086
+<TD>Subtract
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1000001woo101mmm
+<TD>8086
+<TD>Subtract
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1000001woo101mmm
+<TD>8086
+<TD>Subtract
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm
+<TD>1000000woo101mmm
+<TD>8086
+<TD>Subtract
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm
+<TD>1000000woo101mmm
+<TD>8086
+<TD>Subtract
+
+<TR>
+<TD><A NAME="HT">TEST</A>
+<TD>Reg,Reg
+<TD>1000010woorrrmmm
+<TD>8086
+<TD>Test Operands
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>1000010woorrrmmm
+<TD>8086
+<TD>Test Operands
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>1000010woorrrmmm
+<TD>8086
+<TD>Test Operands
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,Imm
+<TD>1010100w
+<TD>8086
+<TD>Test Operands
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm
+<TD>1111011woo000mmm
+<TD>8086
+<TD>Test Operands
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm
+<TD>1111011woo000mmm
+<TD>8086
+<TD>Test Operands
+
+<TR>
+<TD><A NAME="HV">VERR</A>
+<TD>Reg16
+<TD>0000111100000000oo100mmm
+<TD>80286
+<TD>Verify Read
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>0000111100000000oo100mmm
+<TD>80286
+<TD>Verify Read
+
+<TR>
+<TD>VERW
+<TD>Reg16
+<TD>0000111100000000oo101mmm
+<TD>80286
+<TD>Verify Write
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>0000111100000000oo101mmm
+<TD>80286
+<TD>Verify Write
+
+<TR>
+<TD><A NAME="HW">WAIT</A>
+<TD>&nbsp;
+<TD>10011011
+<TD>8086
+<TD>Wait for FPU
+
+<TR>
+<TD>WBINVD
+<TD>&nbsp;
+<TD>0000111100001001
+<TD>80486
+<TD>Write Back and Invalidate Data Cache
+
+<TR>
+<TD>WRMSR
+<TD>&nbsp;
+<TD>0000111100110000
+<TD>Pentium
+<TD>Write to Model Specific Register
+
+<TR>
+<TD><A NAME="HX">XADD</A>
+<TD>Reg,Reg
+<TD>000011111100000woorrrmmm
+<TD>80486
+<TD>Exchange and Add
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>000011111100000woorrrmmm
+<TD>80486
+<TD>Exchange and Add
+
+<TR>
+<TD>XCHG
+<TD>AccWord,RegWord
+<TD>10010rrr
+<TD>8086
+<TD>Exchange
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord,AccWord
+<TD>10010rrr
+<TD>8086
+<TD>Exchange
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Reg
+<TD>1000011woorrrmmm
+<TD>8086
+<TD>Exchange
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>1000011woorrrmmm
+<TD>8086
+<TD>Exchange
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>1000011woorrrmmm
+<TD>8086
+<TD>Exchange
+
+<TR>
+<TD>XLAT
+<TD>&nbsp;
+<TD>11010111
+<TD>8086
+<TD>Translate
+
+<TR>
+<TD>XOR
+<TD>Reg,Reg
+<TD>0011001woorrrmmm
+<TD>8086
+<TD>Exclusive-OR
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Reg
+<TD>0011000woorrrmmm
+<TD>8086
+<TD>Exclusive-OR
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Mem
+<TD>0011001woorrrmmm
+<TD>8086
+<TD>Exclusive-OR
+
+<TR>
+<TD>&nbsp;
+<TD>Acc,Imm
+<TD>0011010w
+<TD>8086
+<TD>Exclusive-OR
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm8
+<TD>1000001woo110mmm
+<TD>8086
+<TD>Exclusive-OR
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm8
+<TD>1000001woo110mmm
+<TD>8086
+<TD>Exclusive-OR
+
+<TR>
+<TD>&nbsp;
+<TD>Reg,Imm
+<TD>1000000woo110mmm
+<TD>8086
+<TD>Exclusive-OR
+
+<TR>
+<TD>&nbsp;
+<TD>Mem,Imm
+<TD>1000000woo110mmm
+<TD>8086
+<TD>Exclusive-OR
+
+<TR>
+<TD>CALL
+<TD>MemFar
+<TD>11111111oo011mmm
+<TD>8086
+<TD>Call a Procedure
+
+<TR>
+<TD>&nbsp;
+<TD>Near
+<TD>11101000
+<TD>8086
+<TD>Call a Procedure
+
+<TR>
+<TD>&nbsp;
+<TD>Far
+<TD>10011010
+<TD>8086
+<TD>Call a Procedure
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord
+<TD>11111111oo010mmm
+<TD>8086
+<TD>Call a Procedure
+
+<TR>
+<TD>&nbsp;
+<TD>MemNear
+<TD>11111111oo010mmm
+<TD>8086
+<TD>Call a Procedure
+
+<TR>
+<TD><A NAME="HJ">Jcc</A>
+<TD>Short
+<TD>0111cccc
+<TD>8086
+<TD>Jump on Some Condition Code
+
+<TR>
+<TD>&nbsp;
+<TD>Near
+<TD>000011111000cccc
+<TD>80386
+<TD>Jump on Some Condition Code
+
+<TR>
+<TD>JCXZ
+<TD>Short
+<TD>11100011
+<TD>8086
+<TD>&nbsp;
+
+<TR>
+<TD>JCXE
+<TD>Short
+<TD>11100011
+<TD>8086
+<TD>&nbsp;
+
+<TR>
+<TD>JECXZ
+<TD>Short
+<TD>11100011 
+<TD>8086
+<TD>&nbsp;
+
+<TR>
+<TD>JECXE
+<TD>Short
+<TD>11100011 
+<TD>8086
+<TD>&nbsp;
+
+<TR>
+<TD>JMP
+<TD>MemFar
+<TD>11111111oo101mmm
+<TD>8086
+<TD>&nbsp;
+
+<TR>
+<TD>&nbsp;
+<TD>Short
+<TD>11101011
+<TD>8086
+<TD>&nbsp;
+
+<TR>
+<TD>&nbsp;
+<TD>Near
+<TD>11101001
+<TD>8086
+<TD>&nbsp;
+
+<TR>
+<TD>&nbsp;
+<TD>Far
+<TD>11101010
+<TD>8086
+<TD>&nbsp;
+
+<TR>
+<TD>&nbsp;
+<TD>RegWord
+<TD>11111111oo100mmm
+<TD>8086
+<TD>&nbsp;
+
+<TR>
+<TD>&nbsp;
+<TD>MemNear
+<TD>11111111oo100mmm
+<TD>8086
+<TD>&nbsp;
+
+<TR>
+<TD>LOOP
+<TD>Short
+<TD>11100010
+<TD>8086
+<TD>Loop Control While ECX Counter Not Zero
+
+<TR>
+<TD>LOOPZ
+<TD>Short
+<TD>11100001
+<TD>8086
+<TD>Loop while Zero
+
+<TR>
+<TD>LOOPE
+<TD>Short
+<TD>11100001
+<TD>8086
+<TD>Loop while Equal
+
+<TR>
+<TD>LOOPNZ
+<TD>Short
+<TD>11100000
+<TD>8086
+<TD>Loop while Not Zero
+
+<TR>
+<TD>LOOPNE
+<TD>Short
+<TD>11100000
+<TD>8086
+<TD>Loop while Not Equal
+
+<TR>
+<TD>LOCK
+<TD>&nbsp;
+<TD>11110000
+<TD>8086
+<TD>Assert Lock# Signal Prefix
+
+<TR>
+<TD>LOCK:
+<TD>&nbsp;
+<TD>11110000
+<TD>8086
+<TD>Assert Lock# Signal Prefix
+
+<TR>
+<TD>REP
+<TD>&nbsp;
+<TD>11110011
+<TD>8086
+<TD>Repeat Following String Operation
+
+<TR>
+<TD>REPE
+<TD>&nbsp;
+<TD>11110011
+<TD>8086
+<TD>Repeat while Equal
+
+<TR>
+<TD>REPZ
+<TD>&nbsp;
+<TD>11110011
+<TD>8086
+<TD>Repeat while Zero
+
+<TR>
+<TD>REPNE
+<TD>&nbsp;
+<TD>11110010
+<TD>8086
+<TD>Repeat while Not Equal
+
+<TR>
+<TD>REPNZ
+<TD>&nbsp;
+<TD>11110010
+<TD>8086
+<TD>Repeat while Not Zero
+
+<TR>
+<TD>CS:
+<TD>&nbsp;
+<TD>00101110
+<TD>8086
+<TD>CS segment override prefix
+
+<TR>
+<TD>DS:
+<TD>&nbsp;
+<TD>00111110
+<TD>8086
+<TD>DS segment override prefix
+
+<TR>
+<TD>ES:
+<TD>&nbsp;
+<TD>00100110
+<TD>8086
+<TD>ES segment override prefix
+
+<TR>
+<TD>FS:
+<TD>&nbsp;
+<TD>01100100
+<TD>80386
+<TD>FS segment override prefix
+
+<TR>
+<TD>GS:
+<TD>&nbsp;
+<TD>01100101
+<TD>80386
+<TD>GS segment override prefix
+
+<TR>
+<TD>SS:
+<TD>&nbsp;
+<TD>00110110
+<TD>8086
+<TD>SS segment override prefix
+
+</TABLE>
+<BR>
+<A NAME="Co"> <HR> </A>
+
+<H3> Co-processor instructions : </H3> <BR>
+<P>
+<TABLE BORDER=all  CELLSPACING=1 CELLPADDING=4 COLS=5 WIDTH=100%>
+<COLW COL=2-5 WIDTH=3>
+<HSPEC COL=1 ALIGN=char CHAR="-">
+
+<TR>
+<TH>Name
+<TH>Regs
+<TH>Opcode
+<TH>Proc
+<TH>Description
+<TR>
+<TD>F2XM1
+<TD>&nbsp;
+<TD>1101100111110000
+<TD>8087
+<TD>2^X-1
+
+<TR>
+<TD>FABS
+<TD>&nbsp;
+<TD>1101100111100001
+<TD>8087
+<TD>Absolute Value of ST
+
+<TR>
+<TD>FADD
+<TD>ST(0),ST(n)
+<TD>1101100011000rrr
+<TD>8087
+<TD>Addition
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101110011000rrr
+<TD>8087
+<TD>Addition
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011000oo000mmm
+<TD>8087
+<TD>Addition
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011000oo000mmm
+<TD>8087
+<TD>Addition
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem64
+<TD>11011100oo000mmm
+<TD>8087
+<TD>Addition
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011100oo000mmm
+<TD>8087
+<TD>Addition
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101110011000rrr
+<TD>8087
+<TD>Addition
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110011000001
+<TD>8087
+<TD>Addition
+
+<TR>
+<TD>FADDP
+<TD>ST(n),ST(0)
+<TD>11011110oo000mmm
+<TD>8087
+<TD>Addition and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>11011110oo000mmm
+<TD>8087
+<TD>Addition and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101111011000001
+<TD>8087
+<TD>Addition and Pop
+
+<TR>
+<TD>FIADD
+<TD>ST(0),Mem16
+<TD>11011110oo000mmm
+<TD>8087
+<TD>Addition (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011110oo000mmm
+<TD>8087
+<TD>Addition (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011010oo000mmm
+<TD>8087
+<TD>Addition (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011010oo000mmm
+<TD>8087
+<TD>Addition (Integer)
+
+<TR>
+<TD>FCMOVcc
+<TD>ST(0),ST(n)
+<TD>1101101n110ccrrr
+<TD>PentiumPro
+<TD>Conditional Move
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101101n110ccrrr
+<TD>PentiumPro
+<TD>Conditional Move
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101101n110cc001
+<TD>PentiumPro
+<TD>Conditional Move
+
+<TR>
+<TD>FCHS
+<TD>&nbsp;
+<TD>1101100111100000
+<TD>8087
+<TD>Change Sign
+
+<TR>
+<TD>FCLEX
+<TD>&nbsp;
+<TD>[FWAIT] 1101101111100010
+<TD>8087
+<TD>Clear Errors
+
+<TR>
+<TD>FNCLEX
+<TD>&nbsp;
+<TD>1101101111100010
+<TD>8087
+<TD>Clear Errors
+
+<TR>
+<TD>FCOM
+<TD>ST(0),Mem64
+<TD>11011100oo010mmm
+<TD>8087
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011100oo010mmm
+<TD>8087
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),ST(n)
+<TD>11011000oo010mmm
+<TD>8087
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011000oo010mmm
+<TD>8087
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>11011000oo010mmm
+<TD>8087
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011000oo010mmm
+<TD>8087
+<TD>Compare
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101100011010001
+<TD>8087
+<TD>Compare
+
+<TR>
+<TD>FCOMP
+<TD>ST(0),Mem64
+<TD>11011100oo011mmm
+<TD>8087
+<TD>Compare and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011100oo011mmm
+<TD>8087
+<TD>Compare and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),ST(n)
+<TD>11011000oo011mmm
+<TD>8087
+<TD>Compare and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011000oo011mmm
+<TD>8087
+<TD>Compare and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>11011000oo011mmm
+<TD>8087
+<TD>Compare and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011000oo011mmm
+<TD>8087
+<TD>Compare and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101100011011001
+<TD>8087
+<TD>Compare and Pop
+
+<TR>
+<TD>FICOM
+<TD>ST(0),Mem16
+<TD>11011110oo010mmm
+<TD>8087
+<TD>Compare (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011110oo010mmm
+<TD>8087
+<TD>Compare (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011010oo010mmm
+<TD>8087
+<TD>Compare (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011010oo010mmm
+<TD>8087
+<TD>Compare (Integer)
+
+<TR>
+<TD>FICOMP
+<TD>ST(0),Mem16
+<TD>11011110oo011mmm
+<TD>8087
+<TD>Compare (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011110oo011mmm
+<TD>8087
+<TD>Compare (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011010oo011mmm
+<TD>8087
+<TD>Compare (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011010oo011mmm
+<TD>8087
+<TD>Compare (Integer) and Pop
+
+<TR>
+<TD>FCOMI
+<TD>ST(0),ST(n)
+<TD>1101101111110rrr
+<TD>PentiumPro
+<TD>Compare Integer (EFLAGS)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101101111110rrr
+<TD>PentiumPro
+<TD>Compare Integer (EFLAGS)
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101101111110001
+<TD>PentiumPro
+<TD>Compare Integer (EFLAGS)
+
+<TR>
+<TD>FCOMIP
+<TD>ST(0),ST(n)
+<TD>1101111111110rrr
+<TD>PentiumPro
+<TD>Compare Integer and Pop (EFLAGS)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101111111110rrr
+<TD>PentiumPro
+<TD>Compare Integer and Pop (EFLAGS)
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101111111110001
+<TD>PentiumPro
+<TD>Compare Integer and Pop (EFLAGS)
+
+<TR>
+<TD>FUCOMI
+<TD>ST(0),ST(n)
+<TD>1101101111101rrr
+<TD>PentiumPro
+<TD>Unordered Compare Integer (EFLAGS)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101101111101rrr
+<TD>PentiumPro
+<TD>Unordered Compare Integer (EFLAGS)
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101101111101001
+<TD>PentiumPro
+<TD>Unordered Compare Integer (EFLAGS)
+
+<TR>
+<TD>FUCOMIP
+<TD>ST(0),ST(n)
+<TD>1101111111101rrr
+<TD>PentiumPro
+<TD>Unordered Compare Integer (EFLAGS)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101111111101rrr
+<TD>PentiumPro
+<TD>Unordered Compare Integer (EFLAGS)
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101111111101001
+<TD>PentiumPro
+<TD>Unordered Compare Integer (EFLAGS)
+
+<TR>
+<TD>FUCOMPP
+<TD>&nbsp;
+<TD>1101111011010101
+<TD>8086
+<TD>Compare and Pop and Pop
+
+
+<TR>
+<TD>FCOS
+<TD>&nbsp;
+<TD>1101100111111111
+<TD>80387
+<TD>Cosine
+
+<TR>
+<TD>FDECSTP
+<TD>&nbsp;
+<TD>1101100111110110
+<TD>8087
+<TD>Decrement Stack Pointer
+
+<TR>
+<TD>FDISI
+<TD>&nbsp;
+<TD>[FWAIT] 1101101111100001
+<TD>8087
+<TD>Disable Interrupts
+
+<TR>
+<TD>FNDISI
+<TD>&nbsp;
+<TD>1101101111100001
+<TD>8087
+<TD>Disable Interrupts
+
+<TR>
+<TD>FDIV
+<TD>ST(0),ST(n)
+<TD>1101100011110rrr
+<TD>8087
+<TD>Division
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101110011111rrr
+<TD>8087
+<TD>Division
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011000oo110mmm
+<TD>8087
+<TD>Division
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011000oo110mmm
+<TD>8087
+<TD>Division
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem64
+<TD>11011100oo110mmm
+<TD>8087
+<TD>Division
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011100oo110mmm
+<TD>8087
+<TD>Division
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101110011111rrr
+<TD>8087
+<TD>Division
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110011111001
+<TD>8087
+<TD>Division
+
+<TR>
+<TD>FDIVP
+<TD>ST(n),ST(0)
+<TD>11011110oo111mmm
+<TD>8087
+<TD>Division and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>11011110oo111mmm
+<TD>8087
+<TD>Division and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101111011111001
+<TD>8087
+<TD>Division and Pop
+
+<TR>
+<TD>FIDIV
+<TD>ST(0),Mem16
+<TD>11011110oo110mmm
+<TD>8087
+<TD>Division (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011110oo110mmm
+<TD>8087
+<TD>Division (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011010oo110mmm
+<TD>8087
+<TD>Division (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011010oo110mmm
+<TD>8087
+<TD>Division (Integer) and Pop
+
+<TR>
+<TD>FDIVR
+<TD>ST(0),ST(n)
+<TD>1101100011111rrr
+<TD>8087
+<TD>Division Reversed
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101110011110rrr
+<TD>8087
+<TD>Division Reversed
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011000oo111mmm
+<TD>8087
+<TD>Division Reversed
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011000oo111mmm
+<TD>8087
+<TD>Division Reversed
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem64
+<TD>11011100oo111mmm
+<TD>8087
+<TD>Division Reversed
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011100oo111mmm
+<TD>8087
+<TD>Division Reversed
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101110011110rrr
+<TD>8087
+<TD>Division Reversed
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110011110001
+<TD>8087
+<TD>Division Reversed
+
+<TR>
+<TD>FDIVRP
+<TD>ST(n),ST(0)
+<TD>11011110oo110mmm
+<TD>8087
+<TD>Division Reversed and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>11011110oo110mmm
+<TD>8087
+<TD>Division Reversed and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101111011110001
+<TD>8087
+<TD>Division Reversed and Pop
+
+<TR>
+<TD>FIDIVR
+<TD>ST(0),Mem16
+<TD>11011110oo111mmm
+<TD>8087
+<TD>Division Reversed (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011110oo111mmm
+<TD>8087
+<TD>Division Reversed (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011010oo111mmm
+<TD>8087
+<TD>Division Reversed (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011010oo111mmm
+<TD>8087
+<TD>Division Reversed (Integer)
+
+<TR>
+<TD>FENI
+<TD>&nbsp;
+<TD>[FWAIT] 1101101111100000
+<TD>8087
+<TD>Disable Interrupts
+
+<TR>
+<TD>FNENI
+<TD>&nbsp;
+<TD>1101101111100000
+<TD>8087
+<TD>Disable Interrupts
+
+<TR>
+<TD>FFREE
+<TD>ST(n)
+<TD>1101110111000rrr
+<TD>8087
+<TD>Free Register
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110111000001
+<TD>8087
+<TD>Free Register
+
+<TR>
+<TD>FINCSTP
+<TD>&nbsp;
+<TD>1101100111110111
+<TD>8087
+<TD>Increment Stack Pointer
+
+<TR>
+<TD>FINIT
+<TD>&nbsp;
+<TD>[FWAIT] 1101101111100011
+<TD>8087
+<TD>Initialize FPU
+
+<TR>
+<TD>FNINIT
+<TD>&nbsp;
+<TD>1101101111100011
+<TD>8087
+<TD>Initialize FPU
+
+<TR>
+<TD>FLD
+<TD>ST(0),Mem32
+<TD>11011001oo000mmm
+<TD>8087
+<TD>Load Data
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011001oo000mmm
+<TD>8087
+<TD>Load Data
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem64
+<TD>11011101oo000mmm
+<TD>8087
+<TD>Load Data
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011101oo000mmm
+<TD>8087
+<TD>Load Data
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem80
+<TD>11011011oo101mmm
+<TD>8087
+<TD>Load Data
+
+<TR>
+<TD>&nbsp;
+<TD>Mem80
+<TD>11011011oo101mmm
+<TD>8087
+<TD>Load Data
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),ST(n)
+<TD>11011001oo000mmm
+<TD>8087
+<TD>Load Data
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>11011001oo000mmm
+<TD>8087
+<TD>Load Data
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101100111000001
+<TD>8087
+<TD>Load Data
+
+<TR>
+<TD>FILD
+<TD>ST(0),Mem16
+<TD>11011111oo000mmm
+<TD>8087
+<TD>Load Data (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011111oo000mmm
+<TD>8087
+<TD>Load Data (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011011oo000mmm
+<TD>8087
+<TD>Load Data (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011011oo000mmm
+<TD>8087
+<TD>Load Data (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem64
+<TD>11011111oo101mmm
+<TD>8087
+<TD>Load Data (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011111oo101mmm
+<TD>8087
+<TD>Load Data (Integer)
+
+<TR>
+<TD>FBLD
+<TD>ST(0),Mem80
+<TD>11011111oo100mmm
+<TD>8087
+<TD>Load Data (BCD)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem80
+<TD>11011111oo100mmm
+<TD>8087
+<TD>Load Data (BCD)
+
+<TR>
+<TD>FLD1
+<TD>&nbsp;
+<TD>1101100111101000
+<TD>8087
+<TD>Load + 1.0
+
+<TR>
+<TD>FLDZ
+<TD>&nbsp;
+<TD>1101100111101110
+<TD>8087
+<TD>Load + 0.0
+
+<TR>
+<TD>FLDPI
+<TD>&nbsp;
+<TD>1101100111101011
+<TD>8087
+<TD>Load PI
+
+<TR>
+<TD>FLDL2E
+<TD>&nbsp;
+<TD>1101100111101010
+<TD>8087
+<TD>Load log2 e
+
+<TR>
+<TD>FLDL2T
+<TD>&nbsp;
+<TD>1101100111101001
+<TD>8087
+<TD>Load log2 10
+
+<TR>
+<TD>FLDLG2
+<TD>&nbsp;
+<TD>1101100111101100
+<TD>8087
+<TD>Load log10 2
+
+<TR>
+<TD>FLDLN2
+<TD>&nbsp;
+<TD>1101100111101101
+<TD>8087
+<TD>Load loge 2
+
+<TR>
+<TD>FLDCW
+<TD>Mem16
+<TD>11011001oo101mmm
+<TD>8087
+<TD>Load Control Register
+
+<TR>
+<TD>FLDENV
+<TD>Mem
+<TD>11011001oo100mmm
+<TD>8087
+<TD>Load Enviroment
+
+<TR>
+<TD>FMUL
+<TD>ST(0),ST(n)
+<TD>1101100011001rrr
+<TD>8087
+<TD>Multiplication
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101110011001rrr
+<TD>8087
+<TD>Multiplication
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011000oo001mmm
+<TD>8087
+<TD>Multiplication
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011000oo001mmm
+<TD>8087
+<TD>Multiplication
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem64
+<TD>11011100oo001mmm
+<TD>8087
+<TD>Multiplication
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011100oo001mmm
+<TD>8087
+<TD>Multiplication
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101110011001rrr
+<TD>8087
+<TD>Multiplication
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110011001001
+<TD>8087
+<TD>Multiplication
+
+<TR>
+<TD>FMULP
+<TD>ST(n),ST(0)
+<TD>11011110oo001mmm
+<TD>8087
+<TD>Multiplication and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>11011110oo001mmm
+<TD>8087
+<TD>Multiplication and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101111011001001
+<TD>8087
+<TD>Multiplication and Pop
+
+<TR>
+<TD>FIMUL
+<TD>ST(0),Mem16
+<TD>11011110oo001mmm
+<TD>8087
+<TD>Multiplication (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011110oo001mmm
+<TD>8087
+<TD>Multiplication (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011010oo001mmm
+<TD>8087
+<TD>Multiplication (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011010oo001mmm
+<TD>8087
+<TD>Multiplication (Integer)
+
+<TR>
+<TD>FNOP
+<TD>&nbsp;
+<TD>1101100111010000
+<TD>8087
+<TD>No Operation
+
+<TR>
+<TD>FPATAN
+<TD>&nbsp;
+<TD>1101100111110011
+<TD>8087
+<TD>Partial Arctangent
+
+<TR>
+<TD>FPREM
+<TD>&nbsp;
+<TD>1101100111111000
+<TD>8087
+<TD>Partial Remainder
+
+<TR>
+<TD>FPREM1
+<TD>&nbsp;
+<TD>1101100111110101
+<TD>80387
+<TD>Partial Remainder (IEEE)
+
+<TR>
+<TD>FPTAN
+<TD>&nbsp;
+<TD>1101100111110010
+<TD>8087
+<TD>Partial Tangent
+
+<TR>
+<TD>FRNDINT
+<TD>&nbsp;
+<TD>1101100111111100
+<TD>8087
+<TD>Round to Integer
+
+<TR>
+<TD>FRSTOR
+<TD>Mem112
+<TD>11011101oo100mmm
+<TD>8087
+<TD>Restore State
+
+<TR>
+<TD>FSAVE
+<TD>Mem112
+<TD>[FWAIT] 11011101oo110mmm
+<TD>8087
+<TD>Save Machine State
+
+<TR>
+<TD>FNSAVE
+<TD>Mem112
+<TD>11011101oo110mmm
+<TD>8087
+<TD>Save Machine State
+
+<TR>
+<TD>FSCALE
+<TD>&nbsp;
+<TD>1101100111111101
+<TD>8087
+<TD>Scale
+
+<TR>
+<TD>FSETPM
+<TD>&nbsp;
+<TD>1101101111100100
+<TD>80287
+<TD>Set Protected Mode
+
+<TR>
+<TD>FSIN
+<TD>&nbsp;
+<TD>1101100111111110
+<TD>80387
+<TD>Sine
+
+<TR>
+<TD>FSINCOS
+<TD>&nbsp;
+<TD>1101100111111011
+<TD>80387
+<TD>Sine and Cosine
+
+<TR>
+<TD>FSQRT
+<TD>&nbsp;
+<TD>1101100111111010
+<TD>8087
+<TD>Square Root
+
+<TR>
+<TD>FST
+<TD>Mem32,ST(0)
+<TD>11011001oo010mmm
+<TD>8087
+<TD>Store
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011001oo010mmm
+<TD>8087
+<TD>Store
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64,ST(0)
+<TD>11011101oo010mmm
+<TD>8087
+<TD>Store
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011101oo010mmm
+<TD>8087
+<TD>Store
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>11011101oo010mmm
+<TD>8087
+<TD>Store
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>11011101oo010mmm
+<TD>8087
+<TD>Store
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110111010001
+<TD>8087
+<TD>Store
+
+<TR>
+<TD>FSTP
+<TD>Mem32,ST(0)
+<TD>11011001oo011mmm
+<TD>8087
+<TD>Store and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011001oo011mmm
+<TD>8087
+<TD>Store and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64,ST(0)
+<TD>11011101oo011mmm
+<TD>8087
+<TD>Store and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011101oo011mmm
+<TD>8087
+<TD>Store and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem80,ST(0)
+<TD>11011011oo111mmm
+<TD>8087
+<TD>Store and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem80
+<TD>11011011oo111mmm
+<TD>8087
+<TD>Store and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101110111011rrr
+<TD>8087
+<TD>Store and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101110111011rrr
+<TD>8087
+<TD>Store and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110111011001
+<TD>8087
+<TD>Store and Pop
+
+<TR>
+<TD>FIST
+<TD>Mem16,ST(0)
+<TD>11011111oo010mmm
+<TD>8087
+<TD>Store (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011111oo010mmm
+<TD>8087
+<TD>Store (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32,ST(0)
+<TD>11011011oo010mmm
+<TD>8087
+<TD>Store (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011011oo010mmm
+<TD>8087
+<TD>Store (Integer)
+
+<TR>
+<TD>FISTP
+<TD>Mem16,ST(0)
+<TD>11011111oo011mmm
+<TD>8087
+<TD>Store (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011111oo011mmm
+<TD>8087
+<TD>Store (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32,ST(0)
+<TD>11011011oo011mmm
+<TD>8087
+<TD>Store (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011011oo011mmm
+<TD>8087
+<TD>Store (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64,ST(0)
+<TD>11011111oo111mmm
+<TD>8087
+<TD>Store (Integer) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011111oo111mmm
+<TD>8087
+<TD>Store (Integer) and Pop
+
+<TR>
+<TD>FBSTP
+<TD>Mem80,ST(n)
+<TD>11011111oo110mmm
+<TD>8087
+<TD>Store (BCD) and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>Mem80
+<TD>11011111oo110mmm
+<TD>8087
+<TD>Store (BCD) and Pop
+
+<TR>
+<TD>FSTCW
+<TD>Mem16
+<TD>[FWAIT] 11011001oo111mmm
+<TD>8087
+<TD>Store Control Register
+
+<TR>
+<TD>FNSTCW
+<TD>Mem16
+<TD>11011001oo111mmm
+<TD>8087
+<TD>Store Control Register
+
+<TR>
+<TD>FSTENV
+<TD>Mem
+<TD>[FWAIT] 11011001oo110mmm
+<TD>8087
+<TD>Store Environment
+
+<TR>
+<TD>FNSTENV
+<TD>Mem
+<TD>11011001oo110mmm
+<TD>8087
+<TD>Store Environment
+
+<TR>
+<TD>FSTSW
+<TD>Mem16
+<TD>[FWAIT] 11011101oo111mmm
+<TD>8087
+<TD>Store Status Register
+
+<TR>
+<TD>&nbsp;
+<TD>AX
+<TD>[FWAIT] 1101111111100000
+<TD>8087
+<TD>Store Status Register
+
+<TR>
+<TD>FNSTSW
+<TD>Mem16
+<TD>11011101oo111mmm
+<TD>8087
+<TD>Store Status Register
+
+<TR>
+<TD>&nbsp;
+<TD>AX
+<TD>1101111111100000
+<TD>8087
+<TD>Store Status Register
+
+<TR>
+<TD>FSUB
+<TD>ST(0),ST(n)
+<TD>1101100011100rrr
+<TD>8087
+<TD>Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101110011101rrr
+<TD>8087
+<TD>Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011000oo100mmm
+<TD>8087
+<TD>Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011000oo100mmm
+<TD>8087
+<TD>Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem64
+<TD>11011100oo100mmm
+<TD>8087
+<TD>Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011100oo100mmm
+<TD>8087
+<TD>Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101110011101rrr
+<TD>8087
+<TD>Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110011101001
+<TD>8087
+<TD>Subtraction
+
+<TR>
+<TD>FSUBP
+<TD>ST(n),ST(0)
+<TD>11011110oo101mmm
+<TD>8087
+<TD>Subtraction and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>11011110oo101mmm
+<TD>8087
+<TD>Subtraction and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101111011101001
+<TD>8087
+<TD>Subtraction and Pop
+
+<TR>
+<TD>FISUB
+<TD>ST(0),Mem16
+<TD>11011110oo100mmm
+<TD>8087
+<TD>Subtraction (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011110oo100mmm
+<TD>8087
+<TD>Subtraction (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011010oo100mmm
+<TD>8087
+<TD>Subtraction (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011010oo100mmm
+<TD>8087
+<TD>Subtraction (Integer)
+
+<TR>
+<TD>FSUBR
+<TD>ST(0),ST(n)
+<TD>1101100011101rrr
+<TD>8087
+<TD>Reverse Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101110011100rrr
+<TD>8087
+<TD>Reverse Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011000oo101mmm
+<TD>8087
+<TD>Reverse Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011000oo101mmm
+<TD>8087
+<TD>Reverse Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem64
+<TD>11011100oo101mmm
+<TD>8087
+<TD>Reverse Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>Mem64
+<TD>11011100oo101mmm
+<TD>8087
+<TD>Reverse Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101110011100rrr
+<TD>8087
+<TD>Reverse Subtraction
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110011100001
+<TD>8087
+<TD>Reverse Subtraction
+
+<TR>
+<TD>FSUBRP
+<TD>ST(n),ST(0)
+<TD>11011110oo100mmm
+<TD>8087
+<TD>Reverse Subtraction and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>11011110oo100mmm
+<TD>8087
+<TD>Reverse Subtraction and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101111011100001
+<TD>8087
+<TD>Reverse Subtraction and Pop
+
+<TR>
+<TD>FISUBR
+<TD>ST(0),Mem16
+<TD>11011110oo101mmm
+<TD>8087
+<TD>Reverse Subtraction (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem16
+<TD>11011110oo101mmm
+<TD>8087
+<TD>Reverse Subtraction (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>ST(0),Mem32
+<TD>11011010oo101mmm
+<TD>8087
+<TD>Reverse Subtraction (Integer)
+
+<TR>
+<TD>&nbsp;
+<TD>Mem32
+<TD>11011010oo101mmm
+<TD>8087
+<TD>Reverse Subtraction (Integer)
+
+<TR>
+<TD>FTST
+<TD>&nbsp;
+<TD>1101100111100100
+<TD>8087
+<TD>Compare with 0.0
+
+<TR>
+<TD>FUCOM
+<TD>ST(0),ST(n)
+<TD>1101110111100rrr
+<TD>80387
+<TD>Unordered Compare
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101110111100rrr
+<TD>80387
+<TD>Unordered Compare
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101110111100rrr
+<TD>80387
+<TD>Unordered Compare
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110111100001
+<TD>80387
+<TD>Unordered Compare
+
+<TR>
+<TD>FUCOMP
+<TD>ST(0),ST(n)
+<TD>1101110111101rrr
+<TD>80387
+<TD>Unordered Compare and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101110111101rrr
+<TD>80387
+<TD>Unordered Compare and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101110111101rrr
+<TD>80387
+<TD>Unordered Compare and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101110111101001
+<TD>80387
+<TD>Unordered Compare and Pop
+
+<TR>
+<TD>FUCOMPP
+<TD>ST(0),ST(n)
+<TD>1101101011101rrr
+<TD>80387
+<TD>Unordered Compare and Pop and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101101011101rrr
+<TD>80387
+<TD>Unordered Compare and Pop and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101101011101rrr
+<TD>80387
+<TD>Unordered Compare and Pop and Pop
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101101011101001
+<TD>80387
+<TD>Unordered Compare and Pop and Pop
+
+<TR>
+<TD>FWAIT
+<TD>&nbsp;
+<TD>10011011
+<TD>8086
+<TD>Wait for FPU
+
+<TR>
+<TD>FXAM
+<TD>&nbsp;
+<TD>1101100111100101
+<TD>8087
+<TD>Examine
+
+<TR>
+<TD>FXCH
+<TD>ST(0),ST(n)
+<TD>1101100111001rrr
+<TD>8087
+<TD>Exchange with Register
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n),ST(0)
+<TD>1101100111001rrr
+<TD>8087
+<TD>Exchange with Register
+
+<TR>
+<TD>&nbsp;
+<TD>ST(n)
+<TD>1101100111001rrr
+<TD>8087
+<TD>Exchange with Register
+
+<TR>
+<TD>&nbsp;
+<TD>&nbsp;
+<TD>1101100111001001
+<TD>8087
+<TD>Exchange with Register
+
+<TR>
+<TD>FXTRACT
+<TD>&nbsp;
+<TD>1101100111110100
+<TD>8087
+<TD>Extract Components
+
+<TR>
+<TD>FYL2X
+<TD>&nbsp;
+<TD>1101100111110001
+<TD>8087
+<TD>ST(1) * log2 ST(0)
+
+<TR>
+<TD>FYL2XP1
+<TD>&nbsp;
+<TD>1101100111111001
+<TD>8087
+<TD>ST(1) * log2 (ST(0)+1.0)
+
+
+</TABLE>
+<P>
+
+<A NAME="Cond"> <HR> </A>
+<H3> Condition codes. </H3> <BR>
+<P>
+
+<TABLE BORDER=all  CELLSPACING=1 CELLPADDING=4 COLS=5 WIDTH=100%>
+<COLW COL=2-5 WIDTH=3>
+<HSPEC COL=1 ALIGN=char CHAR="-">
+
+<TR>
+<TH>CCCC
+<TH>Name
+<TH>Means
+<TH>In short
+
+<TR>
+<TD>0000
+<TD>O
+<TD>overflow
+<TD>o=1
+
+<TR>
+<TD>0001
+<TD>NO
+<TD>Not overflow
+<TD>o=0
+
+<TR>
+<TD>0010
+<TD>C/B/NAE
+<TD>Carry, below, not above nor equal
+<TD>c=1
+
+<TR>
+<TD>0011
+<TD>NC/AE/NB
+<TD>Not carry, above or equal, not below
+<TD>c=0
+
+<TR>
+<TD>0100
+<TD>E/Z
+<TD>Equal, zero
+<TD>z=1
+
+<TR>
+<TD>0101
+<TD>NE/NZ
+<TD>Not equal, not zero
+<TD>z=0
+
+<TR>
+<TD>0110
+<TD>BE/NA
+<TD>Below or equal, not above
+<TD>c=1 or z=1
+
+<TR>
+<TD>0111
+<TD>A/NBE
+<TD>Above, not below nor equal
+<TD>c=0 and z=0
+
+<TR>
+<TD>1000
+<TD>S
+<TD>Sign (negative)
+<TD>s=1
+
+<TR>
+<TD>1001
+<TD>NS
+<TD>Not sign
+<TD>s=0
+
+<TR>
+<TD>1010
+<TD>P/PE
+<TD>Parity, parity even
+<TD>p=1
+
+<TR>
+<TD>1011
+<TD>NP/PO
+<TD>Not parity, parity odd
+<TD>p=0
+
+<TR>
+<TD>1100
+<TD>L/NGE
+<TD>Less, not greater nor equal
+<TD>s<>o
+
+<TR>
+<TD>1101
+<TD>GE/NL
+<TD>Greater or egual, not less
+<TD>s=o
+
+<TR>
+<TD>1110
+<TD>LE/NG
+<TD>Less or equal, not greater
+<TD>z=1 or s<>o
+
+<TR>
+<TD>1111
+<TD>G/NLE
+<TD>Greater, not less nor equal
+<TD>z=0 and s=o
+
+</TABLE>
+
+<P>
+<A NAME="FpuCond"> <HR> </A>
+<H3> Condition codes for FCMOVcc. </H3> <BR>
+<P>
+
+<TABLE BORDER=all  CELLSPACING=1 CELLPADDING=4 COLS=5 WIDTH=100%>
+<COLW COL=2-5 WIDTH=3>
+<HSPEC COL=1 ALIGN=char CHAR="-">
+
+<TR>
+<TH>cc
+<TH>n
+<TH>Name
+<TH>Means
+<TH>In short
+
+<TR>
+<TD>00
+<TD>0
+<TD>C/B/NAE
+<TD>Carry, below, not above nor equal
+<TD>c=1
+
+<TR>
+<TD>00
+<TD>1
+<TD>NC/AE/NB
+<TD>Not carry, above or equal, not below
+<TD>c=0
+
+<TR>
+<TD>01
+<TD>0
+<TD>E/Z
+<TD>Equal, zero
+<TD>z=1
+
+<TR>
+<TD>01
+<TD>1
+<TD>NE/NZ
+<TD>Not equal, not zero
+<TD>z=0
+
+<TR>
+<TD>10
+<TD>0
+<TD>BE/NA
+<TD>Below or equal, not above
+<TD>c=1 or z=1
+
+<TR>
+<TD>10
+<TD>1
+<TD>A/NBE
+<TD>Above, not below nor equal
+<TD>c=0 and z=0
+
+<TR>
+<TD>11
+<TD>0
+<TD>U
+<TD>Unordered
+<TD>C2=1
+
+<TR>
+<TD>11
+<TD>1
+<TD>NU
+<TD>Not Unordered
+<TD>C2=0
+
+</TABLE>
+
+<P>
+<A NAME="Futher"> <HR> </A>
+<H2> Further Reading : </H2> <BR>
+<UL>
+<LI> <A HREF="javascript:if(confirm('http://www.intel.com/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://www.intel.com/'" tppabs="http://www.intel.com/"> Intel </A> <BR>
+<LI> <A HREF="javascript:if(confirm('http://mmx.com/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://mmx.com/'" tppabs="http://mmx.com/"> MMX </A> <BR>
+<LI> <A HREF="javascript:if(confirm('http://www.amd.com/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://www.amd.com/'" tppabs="http://www.amd.com/"> AMD </A> <BR>
+<LI> <A HREF="javascript:if(confirm('http://www.cyrix.com/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://www.cyrix.com/'" tppabs="http://www.cyrix.com/"> Cyrix </A> <BR>
+<LI> <A HREF="javascript:if(confirm('http://www.amd.com/html/products/pcd/nx586/nx586.html  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://www.amd.com/html/products/pcd/nx586/nx586.html'" tppabs="http://www.amd.com/html/products/pcd/nx586/nx586.html"> Nexgen </A> <BR>
+</UL>
+<UL>
+<LI> <A HREF="javascript:if(confirm('http://www.x86.org/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://www.x86.org/'" tppabs="http://www.x86.org/"> Intel Secrets </A> <BR>
+<LI> <A HREF="javascript:if(confirm('http://www.mrbios.com/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://www.mrbios.com/'" tppabs="http://www.mrbios.com/"> Mr BIOS </A> <BR>
+</UL>
+</BODY>
+</HTML>
+
+
+
+

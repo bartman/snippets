@@ -1,0 +1,45 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+#include <algorithm>
+#include <cctype>
+
+using namespace std;
+
+template <class D> class Allocator<D>;
+
+class Foo {
+protected:
+        Allocator<Foo> &m_allocator;
+
+        Foo();
+public:
+        ~Foo();
+
+        void enable () { m_allocator.enable (*this); }
+        void disable () { m_allocator.disable (*this); }
+};
+
+
+template <class K, class D>
+class Allocator {
+protected:
+        map<K,D
+
+public:
+        Allocator ();
+        ~Allocator ();
+
+        D* create (K&);
+        void destroy (D*);
+
+};
+
+
+
+int
+main (void)
+{
+
+        return 0;
+}

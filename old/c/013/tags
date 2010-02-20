@@ -1,0 +1,33 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.4	//
+BP	heap.h	43;"	d
+BUG	heap.h	40;"	d
+HEAP_DEPTH	heap.h	6;"	d
+HEAP_SIZE	heap.h	7;"	d
+OFS_INVAL	heap.h	11;"	d
+__HEAP_H__	heap.h	4;"	d
+cnt	heap.h	/^	ofs_t 	cnt;$/;"	m	struct:heap_s
+data	heap.h	/^	elem_t	data[HEAP_SIZE];$/;"	m	struct:heap_s
+debug	heap.c	/^int debug = 0;$/;"	v
+elem_key	heap.h	/^elem_key (elem_t elem)$/;"	f
+elem_t	heap.h	/^typedef unsigned int elem_t;$/;"	t
+heap_dump	heap.c	/^heap_dump (heap_t *heap)$/;"	f
+heap_init	heap.c	/^heap_init (heap_t *heap)$/;"	f
+heap_left	heap.c	/^heap_left (heap_t *heap, ofs_t ofs)$/;"	f
+heap_parent_of	heap.c	/^heap_parent_of (heap_t *heap, ofs_t ofs)$/;"	f
+heap_right	heap.c	/^heap_right (heap_t *heap, ofs_t ofs)$/;"	f
+heap_s	heap.h	/^typedef struct heap_s {$/;"	s
+heap_swap	heap.c	/^heap_swap (heap_t *heap, ofs_t a, ofs_t b)$/;"	f
+heap_t	heap.h	/^} heap_t;$/;"	t
+main	main.c	/^main (int argc, char *argv)$/;"	f
+minheap_add	minheap.c	/^minheap_add (heap_t *heap, elem_t elem)$/;"	f
+minheap_get_first	minheap.c	/^minheap_get_first (heap_t *heap, elem_t *elem)$/;"	f
+no_dequeue_a	main.c	/^int no_dequeue_a = 10;$/;"	v
+no_dequeue_b	main.c	/^int no_dequeue_b = 1;$/;"	v
+no_enqueue	main.c	/^int no_enqueue = HEAP_SIZE;$/;"	v
+ofs_t	heap.h	/^typedef unsigned int ofs_t;$/;"	t
+pd	heap.h	45;"	d

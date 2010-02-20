@@ -1,0 +1,3 @@
+
+all:
+	@lua test.lua
