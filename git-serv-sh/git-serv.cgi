@@ -47,12 +47,18 @@ if ! cd "/home/git/$proj.git" ; then
         fi
 fi
 
+# this function sets the global 'type' and 'hash' variables
+# that represent the given path
+get_type_and_hash_of () {
+        info=$(git --bare ls-tree HEAD "./$1")
+        rest="${info#* }"   # skip first word
+        type="${rest% *}"   # type = next word
+        rest="${rest#* }"   # skip next word
+        hash="${rest%	*}" # hash = next word
+}
+
 # get node type (blob or tree) and its hash
-info=$(git --bare ls-tree HEAD "./${path}")
-rest="${info#* }"   # skip first word
-type="${rest% *}"   # type = next word
-rest="${rest#* }"   # skip next word
-hash="${rest%	*}" # hash = next word
+get_type_and_hash_of "${path}"
 
 case "$type" in
         tree)
@@ -78,6 +84,14 @@ case "$type" in
                         esac
                 done
                 echo "</table>"
+
+                # maybe there is a README?
+                get_type_and_hash_of "$path/README"
+                if [ -n "$hash" -a "$type" = "blob" ] ; then
+                        echo "<br><hr><br>"
+                        git --bare cat-file blob "$hash" | sed -e 's/$/<br>/'
+                fi
+
                 echo "</body></html>"
                 ;;
         blob)
