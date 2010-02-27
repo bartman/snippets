@@ -58,11 +58,11 @@ case "$type" in
         tree)
                 echo "<head><title>$REQUEST_URI</title></head>"
                 echo "<html><body>"
-                echo "In /$proj/<b>$path</b> ...<br>"
+                echo "In /$proj/<b>$path</b> ...<br><br>"
                 if [ -n "$path" ] ; then
                         here="/$path"
                         upone="${here%/*}"
-                        echo "<a href=/$proj/$upone>Parent directory</b><br>"
+                        echo "<a href=/$proj/$upone>&lt;&lt;Parent directory</a><br>"
                 fi
                 echo "<table>"
                 git --bare ls-tree --long HEAD "./$path/" \
