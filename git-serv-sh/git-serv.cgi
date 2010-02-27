@@ -88,8 +88,10 @@ case "$type" in
                 # maybe there is a README?
                 get_type_and_hash_of "$path/README"
                 if [ -n "$hash" -a "$type" = "blob" ] ; then
-                        echo "<br><hr><br>"
-                        git --bare cat-file blob "$hash" | sed -e 's/$/<br>/'
+                        echo "<br><hr>"
+                        echo "<pre>"
+                        git --bare cat-file blob "$hash"
+                        echo "</pre>"
                 fi
 
                 echo "</body></html>"
