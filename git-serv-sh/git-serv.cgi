@@ -50,15 +50,20 @@ fi
 # this function sets the global 'type' and 'hash' variables
 # that represent the given path
 get_type_and_hash_of () {
-        info=$(git --bare ls-tree HEAD "./$1")
-        rest="${info#* }"   # skip first word
-        type="${rest% *}"   # type = next word
-        rest="${rest#* }"   # skip next word
-        hash="${rest%	*}" # hash = next word
+        if [ -n "$1" ] ; then
+                info=$(git --bare ls-tree HEAD "./$1")
+                rest="${info#* }"   # skip first word
+                type="${rest% *}"   # type = next word
+                rest="${rest#* }"   # skip next word
+                hash="${rest%	*}" # hash = next word
+        else
+                type=tree
+                hash=
+        fi
 }
 
 # get node type (blob or tree) and its hash
-get_type_and_hash_of "${path}"
+get_type_and_hash_of "$path"
 
 case "$type" in
         tree)
