@@ -1,6 +1,7 @@
 #!/bin/sh
 #
-# Bart Trojanowski <bart@jukie.net>
+# Copyright 2010 Bart Trojanowski <bart@jukie.net>
+# Licensed under GPLv2, or later, at your choosing.
 #
 # This here is a poor-man's cgi script that serves contents of a
 # git repo.  It's written using posix sh so it's should be 
