@@ -24,10 +24,13 @@ TMP=/tmp/gcc-capture-$$
 
 { ssh "$REMOTE" sh <<END
 set -x
-REAL_GCC=\$(rpm -ql gcc | grep /bin/gcc | head -n1)
 touch $TMP.c
-strace -f -o $TMP.log -e open \$REAL_GCC -c $TMP.c -o $TMP.o
-FILES=\$(awk -F'"' '/\<open.*= [0-9]/ { print \$2 }' $TMP.log | grep -v -e $TMP -e /tmp)
-tar -ch -C / -f - \$FILES \$REAL_GCC /lib/ld*
+RPM_GCC=\$(rpm -qa | grep '^gcc' | xargs -n1 rpm -ql | grep 'bin/gcc\(\$\|-[0-9]\)')
+DEB_GCC=\$(dpkg --get-selections 'gcc*' 2>/dev/null | awk '{ print \$1 }' | xargs -n1 dpkg -L | grep 'bin/gcc\(\$\|-[0-9]\)')
+for gcc in \$RPM_GCC \$DEB_GCC ; do
+    strace -f -o $TMP.log -e open \$gcc -c $TMP.c -o $TMP.o
+    FILES=\$(awk -F'"' '/\<open.*= [0-9]/ { print \$2 }' $TMP.log | grep -v -e $TMP -e /tmp)
+done
+tar -ch -C / -f - \$FILES \$RPM_GCC \$DEB_GCC /lib*/ld*
 END
 } | ( sleep 1 ; tar xvf - )
