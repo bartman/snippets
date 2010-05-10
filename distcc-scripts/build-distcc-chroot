@@ -1,0 +1,33 @@
+#!/bin/zsh
+#
+# This script captures a tiny distcc environment that contains only gcc.
+#
+# Example:
+#   build-distcc-chroot sles10 root@sles-ten-host
+
+set -e
+
+function die {
+        echo >&2 "$@"
+        exit 1
+}
+
+NAME=$1
+REMOTE=$2
+[[ -n "$NAME" ]] || die "specify a <name> and <remote>"
+[[ -n "$REMOTE" ]] || die "specify a <remote>"
+
+mkdir -p "$1"
+cd "$1"
+
+TMP=/tmp/gcc-capture-$$
+
+{ ssh "$REMOTE" sh <<END
+set -x
+REAL_GCC=\$(rpm -ql gcc | grep /bin/gcc | head -n1)
+touch $TMP.c
+strace -f -o $TMP.log -e open \$REAL_GCC -c $TMP.c -o $TMP.o
+FILES=\$(awk -F'"' '/\<open.*= [0-9]/ { print \$2 }' $TMP.log | grep -v -e $TMP -e /tmp)
+tar -ch -C / -f - \$FILES \$REAL_GCC /lib/ld*
+END
+} | ( sleep 1 ; tar xvf - )
