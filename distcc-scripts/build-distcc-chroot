@@ -44,16 +44,17 @@ TMP=/tmp/gcc-capture-$$
 
 { ssh "$REMOTE" sh <<END
 #set -x
-touch $TMP.c
+echo 'int foo(int bar) { return bar*2; }' > $TMP.c
 RPM_GCC=\$(rpm -qa | grep '^gcc' | xargs -n1 rpm -ql | grep 'bin/gcc\(\$\|-[0-9]\)')
 DEB_GCC=\$(dpkg --get-selections 'gcc*' 2>/dev/null | awk '{ print \$1 }' | xargs -n1 dpkg -L | grep 'bin/gcc\(\$\|-[0-9]\)')
-for gcc in \$RPM_GCC \$DEB_GCC ; do
-    strace -f -o $TMP.log -e open \$gcc -c $TMP.c -o $TMP.o
-    FILES=\$(awk -F'"' '/\<open.*= [0-9]/ { print \$2 }' $TMP.log | grep -v -e $TMP -e /tmp)
-done
+FILES=\$(
+    for gcc in \$RPM_GCC \$DEB_GCC ; do
+        strace -f -o $TMP.log -e open,execve \$gcc -O0 -g -c $TMP.c -o $TMP.o
+        awk -F'"' '/\<(open|exec).*= [0-9]/ { print \$2 }' $TMP.log | grep -v -e $TMP -e '^/tmp'
+    done | perl -pi -e 'while (s,(/[^.][^/]*/\.\.)+,,g) {}')
 tar -ch -C / -f - \$FILES \$RPM_GCC \$DEB_GCC /lib*/ld*
 END
-} | ( sleep 1 ; tar -x -C $CHROOT -vf - | tee $TMP.list )
+} | tar -x -C $CHROOT -vf - | tee $TMP.list
 
 chr_base=$(basename $CHROOT)
 
@@ -66,6 +67,14 @@ grep 'bin/gcc\($\|-[0-9]\)' $TMP.list \
 #!/bin/sh
 sudo=\$( [ \$(id -u) = 0 ] || echo sudo )
 \$sudo chroot $real_chr /$gcc "\$@"
+rc=$?
+for x in \$@ ; do
+    case "\$x" in 
+    /tmp/distccd_*.i|/tmp/distccd_*.o)
+    \$sudo chown distccd.nogroup "\$x" ;;
+    esac
+done
+exit \$rc
 END
     chmod +x "$script"
 done
