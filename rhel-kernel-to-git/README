@@ -1,0 +1,15 @@
+This script takes a rhel4 kernel .spec file (maybe others) and generates
+a git repository with each patch represented by a commit.
+
+$ lftp ftp.redhat.com
+> *hunt*
+> get kernel-2.6.9-89.0.25.EL.src.rpm
+$ alien -t kernel-2.6.9-89.0.25.EL.src.rpm
+$ tar xjf linux-2.6.9-89.0.25.ELsmp.tar.bz2
+$ tar xjf linux-2.6.9.tar.bz2
+$ cd linux-2.6.9
+$ git init
+$ git add .
+$ git commit -m linux-2.6.9
+$ ..../kernel-spec-to-git < ../kernel-2.6.spec
+$ git log
