@@ -1,0 +1,11 @@
+This is my m4a to mp3 conversion script.
+Long story: http://www.jukie.net/~bart/blog/m4a-to-mp3
+
+You'll need to install: zsh faad id3v2 twolame toolame
+
+The script calls 'lame' which may be called something else on your
+system.  Edit the lame= definition at the top of the script, or make a
+symlink.
+
+To use it, just enter a directory with m4a files and run it to convert
+everything, or specify a list of files to convert.
