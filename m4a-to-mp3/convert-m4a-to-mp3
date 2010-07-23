@@ -4,6 +4,10 @@ set -e
 
 prog=$(basename $0)
 
+faad=faad
+lame=lame
+id3v2=id3v2
+
 dest=
 artist_dir=
 
@@ -43,6 +47,10 @@ while [[ "$1" =~ "^-" ]] ; do
         esac
 done
 
+for prog in $faad $lame $id3v2 ; do
+        ( which $prog >/dev/null 2>&1 ) || die "cannot find $prog"
+done
+
 { 
         if [[ -n "$1" ]] ; then
                 [[ -f "$1" ]] || die "$1 is not a file"
@@ -58,7 +66,7 @@ done
 
         [[ -f ${s} ]] || die "file ${s} does not exist"
 
-        faad -i ${s} > ${i} 2>&1
+        $faad -i ${s} > ${i} 2>&1
         sa=$(grep "^artist: ." ${i} | cut -d ' ' -f 2-)
         sA=$(grep "^album: ." ${i} | cut -d ' ' -f 2-)
         sg=$(grep "^genre: ." ${i} | cut -d ' ' -f 2-)
@@ -85,9 +93,9 @@ done
                 d="${dest:-.}/${s/.m4a/.mp3}"
         fi
 
-        faad -o - ${s} | lame - ${d}
+        $faad -o - ${s} | $lame - ${d}
 
         if [[ -n "${st}" || -n "${sa}" ]] ; then
-                id3v2 -a ${sa} -A ${sA} -g ${sg} -t ${st} ${d}
+                $id3v2 -a ${sa} -A ${sA} -g ${sg} -t ${st} ${d}
         fi
 done
