@@ -1,0 +1,81 @@
+#!/bin/zsh
+#
+# This script captures a tiny distcc environment that contains only gcc.
+#
+# Example:
+#   build-distcc-chroot sles10 bin root@sles-ten-host
+#   ./bin/sles10-gcc -v
+
+set -e
+
+function die {
+        echo >&2 "$@"
+        exit 1
+}
+
+function help {
+        cat <<END
+build-distcc-chroot (c) 2010 Bart Trojanowski <bart@jukie.net>
+
+$0 <chroot-dir> <script-dir> <host>
+
+This program will connect to <host> over ssh, grab all the files required
+to run gcc there, copy these to <dir>, and create a <script> that runs
+this compiler in a chroot.
+END
+        exit $1
+}
+
+case "$1" in
+    -h|--help) help 0 ;;
+esac
+
+CHROOT=$1
+BINDIR=$2
+REMOTE=$3
+[[ -n "$CHROOT" ]] || die "specify a <chroot-dir>, a <script-dir> and a <remote>"
+[[ -n "$BINDIR" ]] || die "specify a <script-dir> and a <remote>"
+[[ -n "$REMOTE" ]] || die "specify a <remote>"
+
+mkdir -p "$CHROOT" "$BINDIR"
+real_chr=$(cd $CHROOT && pwd)
+
+TMP=/tmp/gcc-capture-$$
+
+{ ssh "$REMOTE" sh <<END
+#set -x
+echo 'int foo(int bar) { return bar*2; }' > $TMP.c
+RPM_GCC=\$(rpm -qa | grep '^gcc' | xargs -n1 rpm -ql | grep 'bin/gcc\(\$\|-[0-9]\)')
+DEB_GCC=\$(dpkg --get-selections 'gcc*' 2>/dev/null | awk '{ print \$1 }' | xargs -n1 dpkg -L | grep 'bin/gcc\(\$\|-[0-9]\)')
+FILES=\$(
+    for gcc in \$RPM_GCC \$DEB_GCC ; do
+        strace -f -o $TMP.log -e open,execve \$gcc -O0 -g -c $TMP.c -o $TMP.o
+        awk -F'"' '/\<(open|exec).*= [0-9]/ { print \$2 }' $TMP.log | grep -v -e $TMP -e '^/tmp'
+    done | perl -pi -e 'while (s,(/[^.][^/]*/\.\.)+,,g) {}')
+tar -ch -C / -f - \$FILES \$RPM_GCC \$DEB_GCC /lib*/ld*
+END
+} | tar -x -C $CHROOT -vf - | tee $TMP.list
+
+chr_base=$(basename $CHROOT)
+
+grep 'bin/gcc\($\|-[0-9]\)' $TMP.list \
+| while read gcc ; do 
+    gcc_base=$(basename $gcc)
+    script="$BINDIR/${gcc_base}-${chr_base}"
+
+    cat > "$script" <<END
+#!/bin/sh
+sudo=\$( [ \$(id -u) = 0 ] || echo sudo )
+\$sudo chroot $real_chr /$gcc "\$@"
+rc=$?
+for x in \$@ ; do
+    case "\$x" in 
+    /tmp/distccd_*.i|/tmp/distccd_*.o)
+    \$sudo chown distccd.nogroup "\$x" ;;
+    esac
+done
+exit \$rc
+END
+    chmod +x "$script"
+done
+

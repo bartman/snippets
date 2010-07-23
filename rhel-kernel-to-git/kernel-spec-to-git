@@ -1,0 +1,51 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+my @order = ();
+my %file = ();
+my %opts = ();
+
+while (<>) {
+        if (m/^Patch([0-9]+): (.*)$/) {
+                push @order, $1;
+                $file{$1} = $2;
+        }
+
+        if (m/^%patch([0-9]+) (.*)$/) {
+                $opts{$1} = $2;
+        }
+}
+
+foreach my $n (@order) {
+        my $f = $file{$n};
+        my $o = $opts{$n};
+        print "$n $o $f\n";
+
+        next if not defined $f;
+        next if not defined $o;
+
+        my $cat = "cat";
+        $cat = "bunzip2 -c" if $f =~ /bz2$/;
+        $cat = "gunzip -c" if $f =~ /gz$/;
+
+        system ("$cat ../$f | patch -s $o")
+        && die "failed to apply $n\n";
+
+        system ("git add -u")
+        && die "failed to add $n\n";
+
+        my $do = $o;
+        $do =~ s/-R//;
+        
+        system ("$cat ../$f | diffstat -l $do | sed -e 's,^/,,' | xargs git add");
+
+        my $empty = "";
+        my $cnt = `$cat ../$f | diffstat -l $do | wc -l`;
+        $empty = "--allow-empty" if $cnt < 1;
+
+        system ("git commit $empty -m'$f'")
+        && die "failed to commit $n\n";
+}
+
+
