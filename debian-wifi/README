@@ -1,0 +1,8 @@
+Here is how I detect my wireless networks on Debian.
+
+When I run ifup wlan0, etc/network/interfaces calls on which-wlan0.
+This script receives networks I am interested in.  It looks at the
+networks available and tries to find the match.  If it fails it selects
+the strongest open network.
+
+Example network/interfaces file is provided as an example.

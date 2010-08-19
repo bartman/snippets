@@ -1,0 +1,238 @@
+#!/bin/zsh
+
+set -e
+
+DEV=wlan0
+#MOD=iwl3945
+#MOD=iwl4965
+MOD=iwlagn
+
+WAS_LOADED=$(test -d /sys/module/$MOD/ && echo true || echo false)
+
+die() {
+        echo E: $@ >&2
+        $WAS_LOADED && rmmod $MOD
+        exit 1
+}
+
+out() {
+        echo "# $@" >&2
+}
+
+dbg() {
+        #echo "## $@" >&2
+}
+
+if ! $WAS_LOADED ; then
+        modprobe $MOD || die "could not load $MOD"
+fi
+
+# ------------------------------------------------------------------------
+# parse scanning info
+
+ifconfig $DEV up
+( echo 5 >  /sys/bus/pci/drivers/${MOD}/*:*:*.*/power_level ) || true
+iwlist $DEV scanning >/dev/null 2>&1 || die "could not scan"
+
+declare -a cells
+declare -A cell_address
+declare -A cell_essid
+declare -A cell_mode
+declare -A cell_channel
+declare -A cell_encryption
+clear_cells() {
+        cells=()
+        cell_address=()
+        cell_essid=()
+        cell_mode=()
+        cell_channel=()
+        cell_encryption=()
+        qual_cell=""
+        qual_number=0
+        cell=""
+}
+
+find_cells() {
+        clear_cells
+
+        iwlist $DEV scanning last 2>/dev/null | while read line ; do
+                #dbg "line=$line"
+                if echo "$line" | grep -iq "Cell [0-9]* - Address:" ; then
+                        cell=cell_${${line#*[Cc]ell }%% *}
+                        local ap=${line#*: }
+                        #dbg "  -cell  $cell"
+                        #dbg "   ap    $ap"
+                        cells[$((${#cells} + 1))]="$cell"
+                        cell_address[$cell]=$ap
+                elif echo "$line" | grep -iq "ESSID:" ; then
+                        local essid=${line#*:}
+                        local essid=${${${line#*:}#\"}%\"}
+                        #dbg "   essid $essid"
+                        cell_essid[$cell]=$essid
+                elif echo "$line" | grep -q "Mode:" ; then
+                        local mode=${line#*:}
+                        #dbg "   mode  $mode"
+                        cell_mode[$cell]=$mode
+                elif echo "$line" | grep -q "Frequency.*Channel [0-9]" ; then
+                        local ch=${${line#*Channel }%%[^0-9]*}
+                        #dbg "   ch    $ch"
+                        cell_channel[$cell]=$ch
+                elif echo "$line" | grep -q "Encryption key:" ; then
+                        local key=${line#*:}
+                        #dbg "   key   $key"
+                        cell_encryption[$cell]=$key
+                elif echo "$line" | grep -q "Quality=" ; then
+                        local qual=${${line#Quality=}%%[^0-9]*}
+                        #dbg "   qual  $qual"
+                        if test $qual -gt $qual_number ; then
+                                qual_number=$qual
+                                qual_cell=$cell
+                        fi
+                fi
+        done
+}
+
+find_cells
+if [[ ${#cells} -eq 0 ]] ; then
+        out "no cells found, trying again..."
+        find_cells
+fi
+[[ ${#cells} -eq 0 ]] && die "no cells found"
+out
+out "ESSIDs found: ${cell_essid[*]}"
+out "Strongest: ${cell_essid[$qual_cell]}"
+
+for cell in ${cells[*]} ; do
+
+        dbg "- $cell"
+        dbg "  essid   ${cell_essid[$cell]}"
+        dbg "  channel ${cell_channel[$cell]}"
+        dbg "  ap      ${cell_address[$cell]}"
+
+done
+
+# ------------------------------------------------------------------------
+# try a config
+
+test_cell() {
+        local cell=$1
+        local ap=$2
+        local essid=$3
+        local mode=$4
+        local chan=$5
+        local key=$6
+        local ping=$7
+        local best=$8
+
+        local c_address=${cell_address[$cell]}
+        local c_essid=${cell_essid[$cell]}
+        local c_mode=${cell_mode[$cell]}
+        local c_channel=${cell_channel[$cell]}
+        local c_encryption=${cell_encryption[$cell]}
+
+        dbg "  # test_cell '$cell' 'ap=$c_address' 'essid=$c_essid' 'mode=$c_mode' 'channel=$c_channel' 'key=$c_encryption'"
+
+        if test -n "$ap" -a "$ap" != "$c_address" ; then
+                dbg "  # test_cell :: no match ap $ap / $c_address"
+                return 1
+        fi
+
+        if test -n "$essid" -a "$essid" != "$c_essid" ; then
+                dbg "  # test_cell :: no match essid $essid / $c_essid"
+                return 1
+        fi
+
+        if test -n "$mode" -a "$mode" != "$c_mode" ; then
+                dbg "  # test_cell :: no match mode $mode / $c_mode"
+                return 1
+        fi
+
+        if test -n "$chan" -a "$chan" != "$c_channel" ; then
+                dbg "  # test_cell :: no match chanel $chan / $c_channel"
+                return 1
+        fi
+
+        if test -n "$key"  -a "$key"  != "$c_encryption" ; then
+                dbg "  # test_cell :: no match key $key / $c_encryption"
+                return 1
+        fi
+
+        if test -n "$ping" ; then
+                dbg "  # PING not done yet"
+                return 1
+        fi
+
+        if test -n "$best" -a "$cell" != "$qual_cell" ; then
+                dbg "  # test_cell :: no best match $cell / $qual_cell"
+                return 1
+        fi
+
+        dbg "  # test_cell :: match"
+        return 0
+}
+
+test_conf() {
+        local ap=$1
+        local essid=$2
+        local mode=$3
+        local chan=$4
+        local key=$5
+        local ping=$6
+        local best=$7
+
+        dbg "test_conf $@..."
+
+        for cell in ${cells[*]} ; do
+                if test_cell "$cell" "$ap" "$essid" "$mode" "$chan" \
+                        "$key" "$ping" "$best"
+                then
+                        out "Using $cell with essid '${cell_essid[$cell]}' on channel ${cell_channel[$cell]}"
+                        iwconfig $DEV \
+                                essid ${cell_essid[$cell]} \
+                                channel ${cell_channel[$cell]} \
+                                ap ${cell_address[$cell]}
+                        return 0
+                fi
+        done
+
+        dbg "test_conf :: no match"
+        return 1
+}
+
+# ------------------------------------------------------------------------
+# parse configuration
+
+get_var() {
+        local pat=$1
+        local text=" $2"
+        echo "${${text#*$pat=}%% *}"
+}
+
+get_bool() {
+        local pat=$1
+        local text=" $2 "
+        local tmp=${text%%* $pat *}
+        test -z "$tmp" && echo $pat
+}
+
+while read line ; do
+        line=" $line"
+        local ap=$(get_var ap "$line")
+        local essid=$(get_var essid "$line")
+        local mode=$(get_var mode "$line")
+        local chan=$(get_var chan "$line")
+        local key=$(get_var key "$line")
+        local ping=$(get_var ping "$line")
+        local best=$(get_bool best "$line")
+        local action=${line##* }
+
+        if test_conf "$ap" "$essid" "$mode" "$chan" "$key" "$ping" "$best"
+        then
+                out "Action : $action"
+                out
+                echo "$action"
+                return 0
+        fi
+done
+
+exit 1
