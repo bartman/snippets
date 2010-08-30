@@ -4,12 +4,13 @@ a git repository with each patch represented by a commit.
 $ lftp ftp.redhat.com
 > *hunt*
 > get kernel-2.6.9-89.0.25.EL.src.rpm
-$ alien -t kernel-2.6.9-89.0.25.EL.src.rpm
-$ tar xjf linux-2.6.9-89.0.25.ELsmp.tar.bz2
-$ tar xjf linux-2.6.9.tar.bz2
-$ cd linux-2.6.9
-$ git init
-$ git add .
-$ git commit -m linux-2.6.9
-$ ..../kernel-spec-to-git < ../kernel-2.6.spec
+> quit
+$ mkdir tmp
+$ rpm2cpio < kernel-2.6.9-89.0.25.EL.src.rpm | ( cd tmp ; cpio -i -d )
+
+$ git clone git://git2.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
+$ cd linux-2.6
+$ git checkout -b rhel4-2.6.9-89.0.25
+$ ..../kernel-spec-to-git --src ../tmp --spec ../tmp/linux-2.6.spec
+
 $ git log

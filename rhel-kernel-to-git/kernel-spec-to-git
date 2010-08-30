@@ -1,12 +1,26 @@
 #!/usr/bin/perl -w
+use strict;
+use warnings;
+use Getopt::Long;
+use POSIX qw( EXIT_SUCCESS EXIT_FAILURE );
 
 use strict;
 
+my $srcdir = "..";
+my $specfile;
 my @order = ();
 my %file = ();
 my %opts = ();
 
-while (<>) {
+my $rc = GetOptions(
+        'src=s'      => \$srcdir,
+        'spec=s'     => \$specfile,
+);
+die "Invalid options specified.\n" if !$rc;
+
+length($specfile) or die "Use $0 --spec <specfile>.\n";
+open(IN,"$specfile") or die "Couldn't open $specfile\n";
+while (<IN>) {
         if (m/^Patch([0-9]+): (.*)$/) {
                 push @order, $1;
                 $file{$1} = $2;
@@ -16,6 +30,8 @@ while (<>) {
                 $opts{$1} = $2;
         }
 }
+close(IN);
+printf STDERR "Read %u patches.\n", $#order+1;
 
 foreach my $n (@order) {
         my $f = $file{$n};
@@ -25,11 +41,13 @@ foreach my $n (@order) {
         next if not defined $f;
         next if not defined $o;
 
+        -f "$srcdir/$f" or die "there is $f\n";
+
         my $cat = "cat";
         $cat = "bunzip2 -c" if $f =~ /bz2$/;
         $cat = "gunzip -c" if $f =~ /gz$/;
 
-        system ("$cat ../$f | patch -s $o")
+        system ("$cat $srcdir/$f | patch -s $o")
         && die "failed to apply $n\n";
 
         system ("git add -u")
@@ -38,10 +56,10 @@ foreach my $n (@order) {
         my $do = $o;
         $do =~ s/-R//;
         
-        system ("$cat ../$f | diffstat -l $do | sed -e 's,^/,,' | xargs git add");
+        system ("$cat $srcdir/$f | diffstat -l $do | sed -e 's,^/,,' | xargs git add");
 
         my $empty = "";
-        my $cnt = `$cat ../$f | diffstat -l $do | wc -l`;
+        my $cnt = `$cat $srcdir/$f | diffstat -l $do | wc -l`;
         $empty = "--allow-empty" if $cnt < 1;
 
         system ("git commit $empty -m'$f'")
