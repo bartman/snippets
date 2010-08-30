@@ -75,4 +75,5 @@ foreach my $n (@order) {
         && die "failed to commit $n\n";
 }
 
-
+system("git gc")
+&& die "failed to garbage-collect\n";
