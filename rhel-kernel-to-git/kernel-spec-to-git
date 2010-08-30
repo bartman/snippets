@@ -21,12 +21,12 @@ die "Invalid options specified.\n" if !$rc;
 length($specfile) or die "Use $0 --spec <specfile>.\n";
 open(IN,"$specfile") or die "Couldn't open $specfile\n";
 while (<IN>) {
-        if (m/^Patch([0-9]+): (.*)$/) {
+        if (m/^Patch([0-9]+): (\S*)\s*$/) {
                 push @order, $1;
                 $file{$1} = $2;
         }
 
-        if (m/^%patch([0-9]+) (.*)$/) {
+        if (m/^%patch([0-9]+) (.*\S)\s*$/) {
                 $opts{$1} = $2;
         }
 }
