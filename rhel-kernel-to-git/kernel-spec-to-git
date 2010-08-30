@@ -6,6 +6,7 @@ use POSIX qw( EXIT_SUCCESS EXIT_FAILURE );
 
 use strict;
 
+my $min = 0;
 my $srcdir = "..";
 my $specfile;
 my @order = ();
@@ -15,6 +16,7 @@ my %opts = ();
 my $rc = GetOptions(
         'src=s'      => \$srcdir,
         'spec=s'     => \$specfile,
+        'min=n'      => \$min,
 );
 die "Invalid options specified.\n" if !$rc;
 
@@ -41,6 +43,11 @@ foreach my $n (@order) {
         next if not defined $f;
         next if not defined $o;
 
+        if ($n < $min) {
+                warn "... skipping until we reach $min.\n";
+                next;
+        }
+
         my $p = "$srcdir/$f";
         -f $p or die "there is no $p\n";
 
@@ -63,7 +70,7 @@ foreach my $n (@order) {
         my $cnt = `$cat $p | diffstat -l $do | wc -l`;
         $empty = "--allow-empty" if $cnt < 1;
 
-        system ("git commit $empty -m'$f'")
+        system ("git commit $empty -m'$f ($n)'")
         && die "failed to commit $n\n";
 }
 
