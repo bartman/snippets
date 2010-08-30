@@ -33,7 +33,8 @@ while (<IN>) {
         }
 }
 close(IN);
-printf STDERR "Read %u patches.\n", $#order+1;
+my $entries = @order;
+printf STDERR "Read %u patches.\n", $entries;
 
 foreach my $n (@order) {
         my $f = $file{$n};
@@ -65,10 +66,11 @@ foreach my $n (@order) {
         $do =~ s/-R//; # reverse
         $do =~ s/-E//; # ignore tabs
         
-        system ("$cat $p | diffstat -l $do | sed -e 's,^/,,' | xargs git add");
+        my @mods = `$cat $p | diffstat -l $do | sed -e 's,^/,,'`;
+        system ("git add @mods");
 
         my $empty = "";
-        my $cnt = `$cat $p | diffstat -l $do | wc -l`;
+        my $cnt = @mods;
         $empty = "--allow-empty" if $cnt < 1;
 
         system ("git commit $empty -m'$f ($n)'")
