@@ -1,0 +1,101 @@
+#!/bin/zsh
+
+set -e
+
+prog=$(basename $0)
+
+faad=faad
+lame=lame
+id3v2=id3v2
+
+dest=
+artist_dir=
+
+function die() {
+        echo >&2 "$@"
+        exit 1
+}
+
+function do_help() {
+        local exit_with=${1:-0}
+        local out=
+        [[ "$exit_with" -ne 0 ]] && out=">&2"
+        eval echo $out "$prog [ --prefix DIR ] [ --artist-dir ] [ file.m4a ... ]"
+        exit $exit_with
+}
+
+while [[ "$1" =~ "^-" ]] ; do
+        cmd=$1 ; shift
+        case "$cmd" in
+            -p|--prefix)
+                dest=$1
+                [[ -d "$dest" ]] || die "argument of --prefix must be a directory"
+                shift
+                ;;
+            -a|--artist-dir)
+                artist_dir=1
+                ;;
+            -h|--help)
+                do_help 0
+                ;;
+            --debug)
+                set -x
+                ;;
+            -*)
+                do_help 1
+                ;;
+        esac
+done
+
+for prog in $faad $lame $id3v2 ; do
+        ( which $prog >/dev/null 2>&1 ) || die "cannot find $prog"
+done
+
+{ 
+        if [[ -n "$1" ]] ; then
+                [[ -f "$1" ]] || die "$1 is not a file"
+                ls -1d $@ || die "unable to find file(s)"
+        else
+                ls -1d *.m4a || die "no files match *.m4a"
+        fi
+} | while read s ; do
+        echo \# $s
+        i="${dest:-.}/${s/.m4a/.nfo}"
+        b=$(basename $s)
+        b=${b%.m4a}
+
+        [[ -f ${s} ]] || die "file ${s} does not exist"
+
+        $faad -i ${s} > ${i} 2>&1
+        sa=$(grep "^artist: ." ${i} | cut -d ' ' -f 2-)
+        sA=$(grep "^album: ." ${i} | cut -d ' ' -f 2-)
+        sg=$(grep "^genre: ." ${i} | cut -d ' ' -f 2-)
+        st=$(grep "^title: ." ${i} | cut -d ' ' -f 2-)
+        rm -f ${i}
+
+        if [[ "${b}" =~ "^.+ - .+$" ]] ; then
+                [[ -z "${sa}" ]] && sa=${b% - *}
+                [[ -z "${st}" || "${st}" =~ "^Track [0-9]+$" ]] && st=${b#* - }
+        fi
+
+        [[ -z "${sa}" ]] && sa=Unknown
+
+        echo \# artist = ${sa}
+        echo \# album = ${sA}
+        echo \# genre = ${sg}
+        echo \# title = ${st}
+
+        if [[ -n $artist_dir && -n "${sa}" ]] ; then
+                da=${sa//\// }
+                mkdir -p "${dest:-.}/${da}"
+                d="${dest:-.}/${da}/${s/.m4a/.mp3}"
+        else
+                d="${dest:-.}/${s/.m4a/.mp3}"
+        fi
+
+        $faad -o - ${s} | $lame - ${d}
+
+        if [[ -n "${st}" || -n "${sa}" ]] ; then
+                $id3v2 -a ${sa} -A ${sA} -g ${sg} -t ${st} ${d}
+        fi
+done

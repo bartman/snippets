@@ -1,0 +1,43 @@
+# ------------------------------------------------------------------------
+allow-hotplug wlan0
+mapping wlan0
+        # here is the sellection script...
+        script /etc/network/which-wlan0
+        # list of mappings to pass to the script...
+        map essid=home key=on        wifi-home
+        map essid=buddy \
+            ap=00:14:BF:AF:98:30 \
+            chan=5 \
+            key=off                  wifi-open
+        map essid=phone    key=on    wifi-phone
+        map essid=OLS      key=on    wifi-linux-symposium
+        map essid=work     key=on    wifi-work
+        map essid=oclug              wifi-open
+        # fallthrough match
+        map best wifi-open
+
+# ------------------------------------------------------------------------
+# configs
+
+# simple open dhcp
+iface wifi-open inet dhcp
+
+iface wifi-home inet dhcp
+        wpa-ssid home
+        wpa-psk seekr1t
+
+# WEP
+iface wifi-phone inet dhcp
+        wireless-key1   s:seekrit
+        wireless-mode   ad-hoc
+        post-up         ifconfig wlan0 mtu 500
+
+iface wifi-linux-symposium inet dhcp
+        wpa-ssid OLS
+        wpa-psk  topseekrit
+        post-up  ifconfig wlan0 mtu 500
+
+iface wifi-work inet dhcp
+	wpa-ssid 3brigade
+        wpa-psk  3cf36486d33a11153ea6587d11743f89
+
