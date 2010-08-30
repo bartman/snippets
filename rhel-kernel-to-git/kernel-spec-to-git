@@ -62,7 +62,8 @@ foreach my $n (@order) {
         && die "failed to add $n\n";
 
         my $do = $o;
-        $do =~ s/-R//;
+        $do =~ s/-R//; # reverse
+        $do =~ s/-E//; # ignore tabs
         
         system ("$cat $p | diffstat -l $do | sed -e 's,^/,,' | xargs git add");
 
