@@ -41,13 +41,14 @@ foreach my $n (@order) {
         next if not defined $f;
         next if not defined $o;
 
-        -f "$srcdir/$f" or die "there is $f\n";
+        my $p = "$srcdir/$f";
+        -f $p or die "there is no $p\n";
 
         my $cat = "cat";
         $cat = "bunzip2 -c" if $f =~ /bz2$/;
         $cat = "gunzip -c" if $f =~ /gz$/;
 
-        system ("$cat $srcdir/$f | patch -s $o")
+        system ("$cat $p | patch -s $o")
         && die "failed to apply $n\n";
 
         system ("git add -u")
@@ -56,10 +57,10 @@ foreach my $n (@order) {
         my $do = $o;
         $do =~ s/-R//;
         
-        system ("$cat $srcdir/$f | diffstat -l $do | sed -e 's,^/,,' | xargs git add");
+        system ("$cat $p | diffstat -l $do | sed -e 's,^/,,' | xargs git add");
 
         my $empty = "";
-        my $cnt = `$cat $srcdir/$f | diffstat -l $do | wc -l`;
+        my $cnt = `$cat $p | diffstat -l $do | wc -l`;
         $empty = "--allow-empty" if $cnt < 1;
 
         system ("git commit $empty -m'$f'")
