@@ -1,0 +1,6 @@
+I use this script to capture the the apks off my phone just in case an
+upgrade breaks things.
+
+        cd backup
+        git init
+        get-apks [ <serial number> ]

@@ -1,0 +1,47 @@
+#!/bin/zsh
+
+set -e
+
+showcmd=yes
+
+SER=${1:-$(adb devices | sed -r -n 's/^(\w+)\tdevice/\1/p')}
+
+pshell() {
+        ( [[ -n $showcmd ]] && set -x
+        adb -s $SER shell "$@" ) | tr -d '\r'
+}
+ppull() {
+        ( [[ -n $showcmd ]] && set -x
+        adb -s $SER pull "$@" ) | tr -d '\r'
+}
+
+#set -x
+
+dirs=(
+/data/app/
+/data/app-private/
+/sd-ext/app/
+/sd-ext/app-private/
+/system/app/
+/system/framework/
+)
+
+pshell "find $dirs -type f -name '*.apk' 2>/dev/null" \
+| while read apk ; do
+        name=${apk##*/}
+        #echo -ne "\rchecking $name ...                                       "
+        lxsum=
+        [[ -f "$name" ]] && lxsum=$(md5sum "$name" | awk '{ print $1 }')
+        pxsum=$(pshell md5sum "$apk" | awk '{ print $1 }')
+
+        #echo lxsum=$lxsum
+        #echo pxsum=$pxsum
+
+        if [[ "$lxsum" != "$pxsum" ]] ; then
+                echo -e "\rpulling $name ...                                       "
+                ppull "$apk" "$name"
+                git add "$name"
+        fi
+done
+echo
+git commit -m"apk update"
