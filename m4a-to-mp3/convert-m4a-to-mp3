@@ -93,7 +93,7 @@ done
                 d="${dest:-.}/${s/.m4a/.mp3}"
         fi
 
-        $faad -o - ${s} | $lame - ${d}
+        $faad -o - ${s} | $lame --replaygain-accurate --preset 256 -q 0 - ${d}
 
         if [[ -n "${st}" || -n "${sa}" ]] ; then
                 $id3v2 -a ${sa} -A ${sA} -g ${sg} -t ${st} ${d}
