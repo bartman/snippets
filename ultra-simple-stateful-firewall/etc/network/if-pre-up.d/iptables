@@ -1,0 +1,6 @@
+#!/bin/sh
+for ip in ip ip6 ; do
+        if [ -f /etc/default/${ip}tables ] ; then
+                ${ip}tables-restore  < /etc/default/${ip}tables
+        fi
+done

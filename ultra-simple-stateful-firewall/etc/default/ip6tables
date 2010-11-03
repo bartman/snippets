@@ -1,0 +1,33 @@
+# this file can be piped into ip6tables-restore
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [15:780]
+:stateful - [0:0]
+:new - [0:0]
+:serv - [0:0]
+#
+-A INPUT -i lo -j ACCEPT
+-A INPUT -j stateful 
+#
+# If you run KVM with network bridges, you may want the bridges to have ipv6 access:
+#-A FORWARD -i br0 -o br0 -j ACCEPT
+-A FORWARD -j stateful 
+#
+-A stateful -p icmpv6 -j ACCEPT
+-A stateful -m state --state RELATED,ESTABLISHED -j ACCEPT 
+-A stateful -m state --state NEW -j new 
+#-A stateful -m limit --limit 3/min --limit-burst 10 -j LOG --log-prefix "drop6: "
+-A stateful -j REJECT --reject-with icmp6-port-unreachable
+#
+-A new -i lo -j ACCEPT
+-A new -i eth+ -j serv 
+-A new -i br+ -j serv
+-A new -i wlan+ -j serv 
+#
+# If you want to run ipv6 services, enable them like this:
+#-A serv -p tcp --dport 22 -j ACCEPT 
+#-A serv -p udp --dport 3545 -j ACCEPT 
+#-A serv -p udp --sport 5353 --dport 5353 -j ACCEPT
+#
+COMMIT
