@@ -4,13 +4,14 @@
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [15:780]
 :stateful - [0:0]
-:serv - [0:0]
 :new - [0:0]
+:serv - [0:0]
 #
+-A INPUT -i lo -j ACCEPT
 -A INPUT -j stateful 
 #
-# If you run KVM with network bridges, you may want the bridges to have ipv6 access:
--A FORWARD -i br0 -o br0 -j ACCEPT
+# If you run KVM with network bridges, you may want the bridges to have ipv4 access:
+#-A FORWARD -i br0 -o br0 -j ACCEPT
 -A FORWARD -j stateful 
 #
 -A stateful -p icmp -j ACCEPT
@@ -19,17 +20,16 @@
 #-A stateful -m limit --limit 3/min --limit-burst 10 -j LOG --log-prefix "drop4: "
 -A stateful -j REJECT
 #
--A new -i lo -j ACCEPT
--A new -i br+ -j serv
 -A new -i eth+ -j serv 
+-A new -i br+ -j serv
 -A new -i wlan+ -j serv 
-# this allows avahi to work, which is pretty useful if you have dynamic IPs (like with ipv6)
--A new -p udp --sport 5353 --dport 5353 -j ACCEPT
 #
 # if you want to run ipv4 services, enable them like this:
 #-A serv -p tcp --dport 22 -j ACCEPT 
-#
+# this allows avahi to work, which is pretty useful if you have dynamic IPs (like with ipv6)
+-A serv -p udp --sport 5353 --dport 5353 -j ACCEPT
 # this enables DHCPv4 updates
 -A serv -p udp -s 0.0.0.0 -d 255.255.255.255 --sport 68 --dport 67 -j ACCEPT
+#
 #
 COMMIT
