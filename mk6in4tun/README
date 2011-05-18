@@ -1,0 +1,32 @@
+This is a script that generate iproute2 commands to execute to create a
+functional 6in4 tunnel between two end points.
+
+The script takes one parameter, namely the remote IPv4 address.
+
+It randomly picks a subnet IPv6 prefix from the f8c0:/10 space.
+
+It's not intended for real deployments, but rather for testing.
+
+Here is an example:
+
+
+$ ./mktunwith 192.168.1.8
+### tunnel topology
+    [f8c0:69bd::192.168.1.133] 192.168.1.133 (eth0) <======> (???) 192.168.1.8 [f8c0:69bd::192.168.1.8]
+
+### local setup ###
+    sudo modprobe ipv6
+    sudo ip tunnel add tun69bd mode sit local 192.168.1.133 remote 192.168.1.8 ttl 64 dev eth0
+    sudo ip addr add dev tun69bd f8c0:69bd::192.168.1.133/64
+    sudo ip link set dev tun69bd up
+    sudo iptables -I INPUT -s 192.168.1.8 -d 192.168.1.133 -p 41 -j ACCEPT
+
+### remote setup ###
+    sudo modprobe ipv6
+    sudo ip tunnel add tun69bd mode sit local 192.168.1.8 remote 192.168.1.133 ttl 64 
+    sudo ip addr add dev tun69bd f8c0:69bd::192.168.1.8/64
+    sudo ip link set dev tun69bd up
+    sudo iptables -I INPUT -s 192.168.1.133 -d 192.168.1.8 -p 41 -j ACCEPT
+
+### taredown instructions ###
+    sudo ip tunnel rem tun69bd
