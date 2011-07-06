@@ -1,0 +1,33 @@
+#!/bin/sh
+
+echo $1 | awk \
+'{
+  request=$1;
+  prime=2;
+  counter=0;
+  estimate=int( (request+1)*( log(request) + log(log(request)) ) );
+  np[0]=1
+
+  print "+-----------------------------+"
+  print "|      Count            Prime |"
+  print "+-----------------------------+"
+  
+  while ( counter < request ) {
+    counter=counter+1;
+    
+    printf "|%11d%17d |\n", counter, prime;
+    
+    i=prime*2;
+    while ( i < estimate ) {
+      np[i]=1;
+      i=i+prime;
+    }
+    
+    do { prime=prime+1; } while ( np[prime] == 1 );
+
+  }
+
+  print "+-----------------------------+"
+
+}'
+

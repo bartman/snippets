@@ -1,0 +1,37 @@
+#!/bin/bash
+
+request=$1
+prime=2
+counter=0
+estimate=$( echo "($1+1) "'*'" ( l($1) + l(l($1)))" | bc -l | cut -d . -f 1 )
+
+#for (( x=0 ; $x<$estimate ; x++ )) ; do
+#  np[$x]=0
+#done
+
+echo $estimate
+
+echo '+-----------------------------+'
+echo '|      Count            Prime |'
+echo '+-----------------------------+'
+
+while [ $counter -lt $request ] ; do
+  counter=$(( $counter + 1 ))
+  
+  printf "|%11d%17d |\n" $counter $prime
+
+  i=$(( $prime * 2 ))
+  while [ $i -lt $estimate ] ; do
+    np[$i]=1
+    i=$(( $i + $prime ))
+  done
+  
+  prime=$(( $prime + 1 ))
+  while [ x${np[$prime]} = x1 ] ; do
+    prime=$(( $prime + 1 ))
+  done
+  
+done
+
+echo '+-----------------------------+'
+

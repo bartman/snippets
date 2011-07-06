@@ -1,0 +1,2 @@
+primes.o: primes.c
+primes.o: primes.c

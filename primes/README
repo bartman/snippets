@@ -1,0 +1,37 @@
+This is a team submission of:
+
+	Bart Trojanowski <bart@jukie.net>
+	Steve Lusk <steve@gus.jukie.net>
+	Tyler Tidman <tyler.tidman@alcatel.com>
+	Jason Chris Nicolaides <jnicolai@nexus.carleton.ca>
+
+Note that only Bart and Jason are members of the mailing list.  Steve attends
+meetings but is not on the list.  September will be Tyler's first meeting
+
+This is what you fill find in this archive:
+
+|-- languages		- ALL LANGUAGE ENTRIES
+|   |-- assembler		- x86 implementation in assembly
+|   |-- awk			- awk implementation
+|   |-- bash			- bash shell script implementation
+|   |-- caml			- CAML implementation
+|   |-- cpp			- C++ implementation
+|   |-- fortran			- Fortran/77 implementation
+|   |-- html-javascript		- javascript to be ran from a web-browser
+|   |-- pascal			- Pascal implementation
+|   |-- perl			- Perl script implementation
+|   |-- php			- PHP script implementation
+|   `-- tcl			- TCL script implementation
+|
+|-- fast-c		- FASTEST EXECUTION TIME ENTRY
+`-- small-c		- SMALLEST CODE SIZE ENTRY
+
+
+LANGUAGES:  We have 12 different languages represented.
+FAST EXEC:  See 'fast-c' for our speed entry.
+SMALL CODE: See 'small-c' for our tiny code implementation.
+LEGIBILITY: We did not have an entry for this category.
+
+Bart Trojanowski
+<bart@jukie.net>
+

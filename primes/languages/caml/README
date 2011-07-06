@@ -1,0 +1,14 @@
+Compiler:
+
+	rpm -Uhv ocaml-3.02-1.i386.rpm
+
+Compile:
+
+	make
+
+Print 10000 primes:
+
+	./primes 10000
+
+Bart Trojanowski
+<bart@jukie.net>

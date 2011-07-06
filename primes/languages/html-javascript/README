@@ -1,0 +1,8 @@
+How to generate the first 10000 Primes
+======================================
+
+Load the file into any javascript enabled web browser and in the given field
+type the number of primes to be found. 1000 is the default.
+
+Jason Chris Nicolaides 
+<jnicolai@nexus.carleton.ca>

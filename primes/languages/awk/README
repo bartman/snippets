@@ -1,0 +1,6 @@
+Generate 10000 primes:
+
+	./primes 10000
+
+Bart Trojanowski
+<bart@jukie.net>

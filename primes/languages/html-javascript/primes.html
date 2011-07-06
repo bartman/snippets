@@ -1,0 +1,105 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Jason Chris Nicolaides">
+   <meta name="GENERATOR" content="Mozilla/4.77 [en]C-CCK-MCD   (WinNT; U) [Netscape]">
+   <title>Duff Primes for me, Duff Primes for you...</title>
+
+	<script language="JavaScript1.1">
+		var timeLength = 0;
+
+		function generatePrimes() {
+			var numPrimes;
+
+			numPrimes = parseInt(document.forms["formPrimes"].numOfPrimes.value);
+			if(isNaN(numPrimes) || numPrimes < 2){
+				alert("Please enter a positive integer greater than 1.");
+				document.formPrimes.numOfPrimes.value = "1000";
+			}
+			else {
+				timeLength = (new Date()).getTime();
+				runSieve(numPrimes);
+			}
+			return true;
+		}
+
+		function padNumber(number, maxDigits) {
+			var numLength;
+			var padding;
+
+			numLength = (number.toString()).length;
+			if (numLength >= maxDigits){
+				return number;
+			}
+			else {
+				padding = new Array(maxDigits - numLength);
+				padding = padding.join(" ");
+				padding = padding + number;
+				return padding;
+			}
+		}
+		
+		function runSieve(primeCount){
+			var bar = "+-----------------------------+";
+			var currentPrime = 2;
+			var count;
+			var countedPrimes = 0;
+			var arraySize = 0;
+			var primeArray;
+			var outputSpace = document.formPrimes.primeOutput;
+
+			arraySize = primeCount * ( Math.log(primeCount) + Math.log( Math.log( primeCount ) ) );
+			arraySize = Math.round(arraySize);
+			
+			primeArray = new Array(arraySize);
+			outputSpace.value = bar +  "\n|	Count		Prime |\n" + bar;
+
+			while (countedPrimes++ < primeCount) {
+				count = currentPrime;
+				outputSpace.value = outputSpace.value + "\n|" + padNumber(countedPrimes,11) + "   " + padNumber(currentPrime,17) + "|";
+				while( (count += currentPrime) < arraySize ){
+					primeArray[count] = 1;
+				}
+				while( primeArray[++currentPrime] == 1 );
+				
+			}
+			outputSpace.value = outputSpace.value + "\n" + bar;
+			document.formPrimes.timeTaken.value = (new Date()).getTime() - timeLength;
+			alert("Prime Finding Complete");
+
+		}
+	</script>
+</head>
+<body text="#CCCCCC" bgcolor="#000000" link="#33CCFF" vlink="#000099" alink="#CCFFFF">
+	<u><font size=+3>OCLUG Programming Wars:</font></u>&nbsp; 
+	<font size=+2>Battle of the Primes</font>
+	<p>
+		<form name="formPrimes">
+			<table COLS=2 >
+				<caption>All your primes are belong to us...</caption>
+				<tr>
+					<td>
+						Number of Primes to find:&nbsp;
+						<input type="text" value=1000 name="numOfPrimes" size=10>
+					</td>
+
+					<td>
+						<input type="button" value="Generate Primes" name="butGenerate" 
+							onClick="generatePrimes()">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Time Taken to find primes: <input type="text" name="timeTaken" > &nbsp; ms.
+					</td>
+					<td ALIGN=CENTER>
+						<hr WIDTH="100%">
+						<br>
+						<textarea name="primeOutput" cols=40 rows=15></textarea>
+					</td>
+				</tr>
+			</table>
+		</form>
+</body>
+</html>

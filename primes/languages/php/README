@@ -1,0 +1,11 @@
+Select number of primes:
+
+	no nice way to pass params so you must modify the primes.php file:
+	Change '$n = 10000;' to some other value.
+
+Run:
+
+	php primes.php
+
+Tyler Tidman 
+<tyler.tidman@alcatel.com>

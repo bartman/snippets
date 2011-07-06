@@ -1,0 +1,14 @@
+Compiler
+
+	using p2c and gcc.
+
+Comile:
+
+	make
+
+Run for 10000 primes:
+
+	./primes 10000
+
+Bart Trojanowski
+<bart@jukie.net>

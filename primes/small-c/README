@@ -1,0 +1,27 @@
+  Uses the sieve of Eratosthenes.
+  1. Start with a known prime (the base case is 2).  
+  2. Step through all subsequent integers, marking off all multiples of
+that prime.
+  3. Find the next prime by searching for the first non-marked-off number
+subsequent to the current prime.
+  4.  Repeat.
+
+  In the interest of saving space, the variable names are truncated.
+Following is a description of the names.
+
+r:  The [r]equested number of primes on the command line.
+p:  The current [p]rime.
+i:  [i]index into the area, used for Step 2, above.
+c:  [c]ount of number of found primes, for comparison with r.
+s:  [s]ize of the work space array.
+t:  [t]emporary work space array.
+
+  The Prime Number Theorem is used to approximate s.
+
+  The indices of the array t represent the integers in the number line.
+The values at those indices indicate:
+  0 = Prime
+  1 = Composite
+
+Steve Lusk
+<steve@gus.jukie.net>

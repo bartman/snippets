@@ -1,0 +1,200 @@
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <math.h>
+#include <sys/mman.h>
+
+#if defined( PROFILE ) || defined( DEBUG )
+#define INLINE /* inlines are not desired for profiling/debugging */
+#else
+#define INLINE inline
+#endif
+
+
+
+unsigned char *not_primes;
+unsigned char *not_primes_end;
+unsigned int not_primes_size;
+unsigned int prime_count;
+
+void
+help(const char *program_name)
+{
+  fprintf(stderr,
+      "Prime Generation - Bart Trojanowski\n"
+      "Syntax: %s <number of primes to generate>\n");
+  exit(1);
+}
+
+/*
+* This function attempts to estimate the value of the prime number
+* in the sequence of all primes starting at '2' at a specified index.
+* NOTE: the function guarantees that the returned value will be bigger
+* than the prime found at index -- this is valid for index <= 2^32.
+*/
+INLINE unsigned int
+predict_prime_at_index( unsigned int index )
+{
+  static const float fudge[] = { 
+    0.000000, -0.214097, -0.393810, -0.376674, -0.159889, -0.149010, 
+    -0.092325, -0.048293, -0.025966, -0.018961, -0.012022, -0.003489, 
+    -0.003486, -0.000951, -0.002036, -0.000762, -0.001187, -0.000146 };
+  static const int delta[] = { 
+    5, 5, 6, 10, 19, 36, 54, 90, 128, 159, 240, 
+    188, -146, -394, -1609, -476, 2888, 11021};
+  int section = log(index);
+  if( section < sizeof(fudge) ) {
+    int sectstart = exp(section);
+    /* The Prime Number Theorem states that the n-th prime is approximately
+    * p(n), where p(n) is defined as follows:
+    *   n (log n + log log n - 1.0073) < p(n) < n (log n + log log n - 0.9385)
+    * In this version we have special fudge factors to limit the error
+    * of the estimate within our range (log(index)<18).
+    */
+    return index * (section + log(section) - 0.95460272) 
+      - (index-sectstart)*fudge[section] + delta[section];
+  }
+  // fallback function... does not do all that well on the estimates.
+  return index * (section +log(section) - 0.9385);
+}
+
+INLINE void
+allocate( unsigned int desired_primes )
+{
+  not_primes_size = predict_prime_at_index( desired_primes ) >> 1;
+  not_primes_size += desired_primes;
+
+  not_primes = (void*)malloc(not_primes_size*sizeof(*not_primes));
+  if( ! not_primes ) {
+    fprintf(stderr,
+	"malloc(%d): %s\n", not_primes_size*sizeof(*not_primes), strerror(errno));
+    exit(1);
+  }
+
+  not_primes_end = not_primes + not_primes_size;
+
+  /* yes, I want all my memory resident please */
+  mlockall(MCL_CURRENT);
+  
+  memset(not_primes,0,not_primes_size);
+}
+
+INLINE void
+mark_prime( unsigned int index )
+{
+  unsigned int prime = (index<<1) + 1;
+  /* mark the multiples of this prime */
+#if 0
+  unsigned char *p;
+  p = not_primes + index;
+  while( p < not_primes_end ) {
+    (*p) ++;
+    p += prime;
+  }
+#else
+  unsigned int i;
+  for( i = index ; i < not_primes_size ; i += prime ) {
+    not_primes[i]++;
+  }
+#endif
+}
+
+INLINE unsigned int
+get_next_prime( unsigned int index )
+{
+  unsigned int i;
+  
+  i = index; 
+  while( not_primes[++i] );
+  
+  return i;
+}
+
+INLINE void
+print_header( void )
+{
+#if defined(QUICK_PRINT)
+  puts("1 2");
+#else
+  puts( "+-----------------------------+\n"
+	"|      Count            Prime |\n"
+	"+-----------------------------+\n"
+	"|          1                2 |");
+#endif
+}
+
+INLINE void
+print_prime( unsigned int index ) 
+{
+  static char string[] = "|          1                2 |";
+#if defined(QUICK_PRINT)
+  unsigned int prime = (index<<1) + 1;
+  //printf("|%11d%17d |\n", prime_count, prime);
+  printf("%d %d\n", 
+      prime_count, prime);
+#else
+  unsigned int c,n;
+  char *p;
+  
+  p = string+11;
+  n = prime_count;
+  while( n ) {
+    c = n % 10;
+    n = n / 10;
+    *p = '0'+c;
+    p--;
+  }
+    
+  p = string+28;
+  n = (index<<1) + 1;
+  while( n ) {
+    c = n % 10;
+    n = n / 10;
+    *p = '0'+c;
+    p--;
+  }
+    
+  puts(string);
+#endif
+}
+
+INLINE void
+print_footer( void )
+{
+#if !defined(QUICK_PRINT)
+  puts("+-----------------------------+");
+#endif
+}
+
+int
+main(int argc, const char *argv[])
+{
+  unsigned int to_find, suspect;
+  
+  /* read the argument that will specify the number of primes to find */
+  if ( argc < 2 ) help(argv[0]);
+  to_find = atoi(argv[1]);
+
+  /* initialize structures */
+  allocate( to_find );
+
+  /* seed our not_primes arrays... we are allowed the first prime */
+  not_primes[0] = 1; /* 1 is not prime */
+  
+  prime_count = 1;   /* 2 is known to be a prime */
+  suspect = 1;       /* we will start with the prime 3 */
+
+  print_header();    /* this includes the number two */
+  
+  while( prime_count < to_find ) {
+    prime_count++;
+    print_prime( suspect );
+    mark_prime( suspect );
+    suspect = get_next_prime( suspect );
+  }
+
+  print_footer();
+  
+  return 0;
+}
+

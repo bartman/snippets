@@ -1,0 +1,8 @@
+How to generate the first 10000 Primes
+======================================
+
+Since this is a normal perl program simply specify the number of
+primes to be found on the command line, "./primes.pl 10000"
+
+Jason Chris Nicolaides 
+<jnicolai@nexus.carleton.ca>

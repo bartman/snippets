@@ -1,0 +1,10 @@
+Compile:
+
+	make
+
+Run for 10000 primes:
+
+	./primes 10000
+
+Steve Lusk
+<steve@gus.jukie.net>

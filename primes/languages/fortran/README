@@ -1,0 +1,17 @@
+Select number of primes to print:
+
+	There is no nice way to pass command line params to the program so you
+	need to change the code.  On line 8 modify the 'request = 10000' to 
+	something else.
+
+Compile:
+
+	make
+
+Run:
+
+	./primes
+
+
+Bart Trojanowski
+<bart@jukie.net>
