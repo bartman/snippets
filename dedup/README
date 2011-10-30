@@ -1,0 +1,9 @@
+dedup is a script that removes duplicate .jpg and .nef files from the
+directory in which it's ran.  The duplicates are moved to a "dups"
+subdirectory, which is created.
+
+It works by taking the md5sum of each file found, sorting the list by
+md5sum, and then comparing each file with other files having the same
+md5sum.  Any identical files will then be treated as duplicates.
+
+I chose this algorithm as it was O(n).
