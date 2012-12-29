@@ -38,6 +38,14 @@ int main(void)
 
 	printf("map[0] = 0x%08x\n", data[0]);
 
+	data[0] = 1;
+
+	printf("map[0] = 0x%08x\n", data[0]);
+
+	msync(data, sizeof(data[0]), MS_SYNC);
+
+	printf("map[0] = 0x%08x\n", data[0]);
+
 	close(fd);
 	munmap(data, size);
 	return 0;

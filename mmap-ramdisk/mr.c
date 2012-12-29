@@ -163,7 +163,7 @@ static int mr_mmap(struct file *filp, struct vm_area_struct *vma)
 	pages = size >> PAGE_SHIFT;
 	vp_size = sizeof(*vp) + pages * sizeof(vp->pages[0]);
 
-	pr_info("mr: new context for pages=%u\n", pages);
+	pr_info("mmap: new context for pages=%u\n", pages);
 
 	vp = vzalloc(vp_size);
 	if (!vp) {
@@ -180,23 +180,44 @@ static int mr_mmap(struct file *filp, struct vm_area_struct *vma)
 
 	vma->vm_private_data = vp;
 #if 0
-	vma->vm_flags |= VM_IO
-		     //| VM_LOCKED
-		     //| VM_PFNMAP
-		       | VM_RESERVED
-		       | VM_DONTEXPAND
-		       ;
+	vma->vm_flags |= VM_IO;           // uses vmops->access()
+	vma->vm_flags |= VM_LOCKED;       // pages are mlock()'ed
+	vma->vm_flags |= VM_PFNMAP;       // linear mapping ptr -> PFN
+	vma->vm_flags |= VM_RESERVED;     // unevictable, kernel allocated
+	vma->vm_flags |= VM_DONTEXPAND;   // no mremap(), kernel allocated
 #endif
 
 	vma->vm_ops = &mr_vmops;
 
+	pr_info("mmap: vm_file=%p\n", vma->vm_file);
+
 	return 0;
+}
+
+static ssize_t mr_sendpage(struct file *filp, struct page *page, int offset,
+		size_t size, loff_t *ppos, int more)
+{
+	pr_info("sendpage: page=%p ofs=%u size=%lu pos=%llu more=%u\n",
+			page, offset, size, *ppos, more);
+
+	return size;
+}
+
+ssize_t mr_write(struct file *filp, const char __user *buf, size_t size,
+		loff_t *ppos)
+{
+	pr_info("write: buf=%p size=%lu pos=%llu\n",
+			buf, size, *ppos);
+
+	return size;
 }
 
 static const struct file_operations mr_fops = {
 	.owner = THIS_MODULE,
 	.open  = nonseekable_open,
 	.mmap  = mr_mmap,
+	.sendpage = mr_sendpage,
+	.write = mr_write,
 };
 
 static struct miscdevice mr_misc = {
