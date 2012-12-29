@@ -18,6 +18,7 @@ load: all unload
 
 unload:
 	if lsmod | grep -q '^mr\>' ; then \
+		sync ; sync ; \
 		sudo rmmod mr ; \
 	fi
 

@@ -26,17 +26,19 @@ int main(void)
 {
 	uint32_t *data;
 	int fd;
+	size_t size = 1024 * 1024;
 	
 	fd = open("/dev/mr", O_RDWR);
 	if (fd < 1) die("open(/dev/mr): %s\n", strerror(errno));
 
-	data = mmap(0, 0x00300000, PROT_READ | PROT_WRITE, MAP_SHARED, fd,
-			0xc0000000);
-	if (fd < 1) die("open(/dev/mr): %s\n", strerror(errno));
+	data = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd,
+			0);
+	if (fd < 1)
+		die("mmap(/dev/mr): %s\n", strerror(errno));
 
-	printf("map[0] = 0x%08x", data[0]);
+	printf("map[0] = 0x%08x\n", data[0]);
 
 	close(fd);
-	munmap(data, 0x00300000);
+	munmap(data, size);
 	return 0;
 }
