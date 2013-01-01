@@ -25,7 +25,7 @@ void die(const char *fmt, ...)
 int main(void)
 {
 	uint32_t *data;
-	int fd;
+	int fd, rc;
 	size_t size = 1024 * 1024;
 	
 	fd = open("/dev/mr", O_RDWR);
@@ -42,7 +42,9 @@ int main(void)
 
 	printf("map[0] = 0x%08x\n", data[0]);
 
-	msync(data, sizeof(data[0]), MS_SYNC);
+	rc = msync(data, sizeof(data[0]), MS_SYNC);
+	if (rc)
+		die("msync(/dev/mr): %s\n", strerror(errno));
 
 	printf("map[0] = 0x%08x\n", data[0]);
 
