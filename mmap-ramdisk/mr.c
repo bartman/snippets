@@ -102,6 +102,7 @@ static int mr_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		spin_lock(&vp->lock);
 		if (!vp->pages[index]) {
 			vp->pages[index] = page;
+			page->index = index;
 			vp->count ++;
 		} else {
 			__free_page(page);
