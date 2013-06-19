@@ -7,18 +7,212 @@
 #include <linux/atomic.h>
 #include <linux/writeback.h>
 #include <linux/backing-dev.h>
+#include <linux/pagemap.h>
+#include <linux/rmap.h>
 
 #define USE_INSERT_PFN
 
+static DEFINE_SPINLOCK(mr_vma_list_lock);
+static LIST_HEAD(mr_vma_list);
+
+/*
+ * I modified mm/memory.c to print pte flags before and after the
+ * do_wp_page() promotion in the handle_pte_fault() function..
+ *
+ * After the page is allocated write-protect when mrc.c does printf()
+ * on a byte in the mmap'ed area, the pte flags are:
+ *
+ *    0x29  (Accessed, Write Through, Present)
+ *
+ * mrc.c then modifies the page by writing 1 to the first byte, which causes
+ * a fault to the already-mapped page due to permissions being writeProtect.
+ * The page_mkwrite() gets called and we see:
+ *
+ *    0x25  (Accessed, Userspace, Present)
+ *
+ * This is ok.  I see that in handle_pte_fault(), just after the call to do_wp_page()
+ * that the page is marked Dirty and Writeable.
+ *
+ * I added a silly ioctl() to demote pages to WriteProtect to see the behaviour.
+ * Before demotion, the page flags are:
+ *
+ *    0x67  (Dirty, Accessed, Userspace, Writeable, Present)
+ *
+ * and 0x67 after demotion (Clearing the Writeable bit).
+ *
+ * The next write from mrc.c does then cause another page fault, as evidenced by
+ * a call into page_mkwrite().
+ */
+//extern unsigned long xx_mmap_fault_address;
+
+/*
+ * At what user virtual address is page expected in @vma?
+ * Returns virtual address or -EFAULT if page's index/offset is not
+ * within the range mapped the @vma.
+ */
+inline unsigned long
+vma_address(struct page *page, struct vm_area_struct *vma)
+{
+	pgoff_t pgoff = page->index << (PAGE_CACHE_SHIFT - PAGE_SHIFT);
+	unsigned long address;
+
+	address = vma->vm_start + ((pgoff - vma->vm_pgoff) << PAGE_SHIFT);
+	if (unlikely(address < vma->vm_start || address >= vma->vm_end)) {
+		/* page should be within @vma mapping range */
+		return -EFAULT;
+	}
+	return address;
+}
+
+#if 0
+/*
+ * At what user virtual address is page expected in vma?
+ * Caller should check the page is actually part of the vma.
+ */
+static unsigned long mr_page_address_in_vma(struct page *page, struct vm_area_struct *vma)
+{
+	if (PageAnon(page)) {
+		struct anon_vma *page__anon_vma = page_anon_vma(page);
+		/*
+		 * Note: swapoff's unuse_vma() is more efficient with this
+		 * check, and needs it to match anon_vma when KSM is active.
+		 */
+		if (!vma->anon_vma || !page__anon_vma ||
+		    vma->anon_vma->root != page__anon_vma->root)
+			return -EFAULT;
+	} else if (page->mapping && !(vma->vm_flags & VM_NONLINEAR)) {
+		if (!vma->vm_file ||
+		    vma->vm_file->f_mapping != page->mapping)
+			return -EFAULT;
+	} else
+		return -EFAULT;
+	return vma_address(page, vma);
+}
+#endif
+
+/*
+ * Check that @page is mapped at @address into @mm.
+ *
+ * If @sync is false, page_check_address may perform a racy check to avoid
+ * the page table lock when the pte is not present (helpful when reclaiming
+ * highly shared pages).
+ *
+ * On success returns with pte mapped and locked.
+ */
+static pte_t *mr__page_check_address(struct page *page, struct mm_struct *mm,
+			  unsigned long address, spinlock_t **ptlp, int sync)
+{
+	pgd_t *pgd;
+	pud_t *pud;
+	pmd_t *pmd;
+	pte_t *pte;
+	spinlock_t *ptl;
+
+	pgd = pgd_offset(mm, address);
+	if (!pgd_present(*pgd))
+		return NULL;
+
+	pud = pud_offset(pgd, address);
+	if (!pud_present(*pud))
+		return NULL;
+
+	pmd = pmd_offset(pud, address);
+	if (!pmd_present(*pmd))
+		return NULL;
+	if (pmd_trans_huge(*pmd))
+		return NULL;
+
+	pte = pte_offset_map(pmd, address);
+	/* Make a quick check before getting the lock */
+	if (!sync && !pte_present(*pte)) {
+		pte_unmap(pte);
+		return NULL;
+	}
+
+	ptl = pte_lockptr(mm, pmd);
+	spin_lock(ptl);
+	if (pte_present(*pte) && page_to_pfn(page) == pte_pfn(*pte)) {
+		*ptlp = ptl;
+		return pte;
+	}
+	pte_unmap_unlock(pte, ptl);
+	return NULL;
+}
+
 struct mr_vma_priv {
+	struct vm_area_struct *vma;
 	atomic_t refcnt;
 	spinlock_t lock;
 	int count, max;
-	unsigned long vm_start;
-	unsigned long vm_end;
+	/*
+	 * Probably need a pgoff as well, in case an existing VMA is expanded.
+	 * In that case, one vma would have multiple backing mr_vma_privs,
+	 * covering the entire range of the vma
+	 */
+	struct list_head list;
 	struct page *pages[0];
 };
 
+
+void do_page_protect(void)
+{
+	struct mr_vma_priv *vp;
+	struct vm_area_struct *vma;
+	int i;
+
+	/* Just a proof of concept.  Resets all pages in the first VMA to WriteProtect */
+	vp = list_first_entry(&mr_vma_list, struct mr_vma_priv, list);
+	if (!vp) {
+		pr_info("List entry was NULL\n");
+		return;
+	}
+
+	vma = vp->vma;
+	pr_info("page_protect: vma=%p\n", vma);
+	for (i = 0; i < vp->max; i++) {
+		struct page *page = vp->pages[i];
+		unsigned long address;
+		spinlock_t *ptl;
+		pte_t *ptep;
+
+		if (!page)
+			continue;
+		pr_info("page_protect: page=%p\n", page);
+
+		// Gives me EFAULT
+		//address = mr_page_address_in_vma(page, vma);
+		address = vma_address(page, vma);
+		if (address == -EFAULT) {
+			pr_info("%s: Got EFAULT\n", __FUNCTION__);
+			return;
+		} else if (address == 0) {
+			pr_info("%s: Got NULL\n", __FUNCTION__);
+			return;
+		}
+		pr_info("page_protect: address=%lx\n", address);
+		ptep = mr__page_check_address(page, vma->vm_mm, address, &ptl, 0);
+		if (!ptep) {
+			pr_info("%s: No pte\n", __FUNCTION__);
+			return;
+		}
+
+		pr_info("page_protect: Before protect pte_flags=%lx\n", pte_flags(*ptep));
+		//if (pte_dirty(*ptep))
+		//	pr_info("PTE is dirty\n");
+		//else
+		//	pr_info("PTE is clean\n");
+		ptep_set_wrprotect(vma->vm_mm, address, ptep);
+		pte_unmap_unlock(ptep, ptl);
+		/*
+		 * Not exported in SLES11.2. try flush_cache_page()?
+		 * I'm not sure that anything is required on x86...
+		 */
+		//mmu_notifier_invalidate_page(vma->vm_mm, address);
+		flush_cache_page(vma, address, pte_pfn(ptep));
+		pr_info("page_protect: After protect pte_flags=%lx\n", pte_flags(*ptep));
+	}
+	return;
+}
 
 static void mr_vm_open(struct vm_area_struct * vma)
 {
@@ -63,6 +257,11 @@ static void mr_vm_close(struct vm_area_struct * vma)
 		__free_page(page);
 		vp->count --;
 	}
+	//xx_mmap_fault_address = 0;
+
+	spin_lock(&mr_vma_list_lock);
+	list_del(&vp->list);
+	spin_unlock(&mr_vma_list_lock);
 
 	pr_info("close: free\n");
 
@@ -80,9 +279,10 @@ static int mr_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 
 	vp = vma->vm_private_data;
 
-	pr_info("fault: vma=%p file=%p as=%p\n", vma,
+	pr_info("fault: vma=%p file=%p as=%p va=%p\n", vma,
 			vma->vm_file,
-			vma->vm_file ? vma->vm_file->f_mapping : NULL);
+			vma->vm_file ? vma->vm_file->f_mapping : NULL,
+			vmf->virtual_address);
 
 	pr_info("fault: fault pfoff=%lu\n", vmf->pgoff);
 
@@ -117,6 +317,7 @@ static int mr_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 #endif
 
 	get_page(page);
+	//xx_mmap_fault_address = (unsigned long)vmf->virtual_address;
 
 #ifndef USE_INSERT_PFN
 	pfn = page_to_pfn(page);
@@ -137,16 +338,20 @@ static int mr_vm_access(struct vm_area_struct *vma, unsigned long addr,
 #endif
 
 
-
-
-
-
-
+/* Notify when pages are promoted from WriteProtect to Read/Write */
+static int mr_vm_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+{
+	pr_info("mkwrite: vma=%p, file=%p, as=%p, va=%p\n", vma, vma->vm_file,
+			vma->vm_file ? vma->vm_file->f_mapping : NULL,
+			vmf->virtual_address);
+	return VM_FAULT_LOCKED;
+}
 
 static struct vm_operations_struct mr_vmops = {
 	.open   = mr_vm_open,
 	.close  = mr_vm_close,
 	.fault  = mr_vm_fault,
+	.page_mkwrite = mr_vm_mkwrite,
 #if 0
 	.access = mr_vm_access,
 #endif
@@ -195,8 +400,7 @@ static int mr_mmap(struct file *filp, struct vm_area_struct *vma)
 		return -ENOMEM;
 	}
 
-	vp->vm_start = vma->vm_start;
-	vp->vm_end = vma->vm_end;
+	vp->vma = vma;
 	vp->max = pages;
 
 	spin_lock_init(&vp->lock);
@@ -213,6 +417,10 @@ static int mr_mmap(struct file *filp, struct vm_area_struct *vma)
 
 	vma->vm_ops = &mr_vmops;
 
+	spin_lock(&mr_vma_list_lock);
+	list_add(&vp->list, &mr_vma_list);
+	spin_unlock(&mr_vma_list_lock);
+
 	pr_info("mmap: vm_file=%p\n", vma->vm_file);
 
 	return 0;
@@ -224,6 +432,7 @@ static int mr_writepages(struct address_space *mapping,
 	pr_info("writepages: mapping=%p nr=%lu skip=%lu range=%llx:%llx sync=%d\n",
 			mapping, wbc->nr_to_write, wbc->pages_skipped,
 			wbc->range_start, wbc->range_end, wbc->sync_mode);
+	pr_info("writepages: host=%p\n", mapping->host);
 	return 0;
 }
 
@@ -408,6 +617,21 @@ ssize_t mr_write(struct file *filp, const char __user *buf, size_t size,
 	return size;
 }
 
+
+static long mr_ioctl(struct file *filp, unsigned int command, unsigned long arg)
+{
+
+	pr_info("ioctl: cmd=%d\n", command);
+	switch (command) {
+	case 55:
+		do_page_protect();
+		return 0;
+	default:
+		return -EINVAL;
+	}
+}
+
+
 static const struct file_operations mr_fops = {
 	.owner = THIS_MODULE,
 	.open  = mr_open,
@@ -415,6 +639,7 @@ static const struct file_operations mr_fops = {
 	.mmap  = mr_mmap,
 	.sendpage = mr_sendpage,
 	.write = mr_write,
+	.unlocked_ioctl = mr_ioctl,
 };
 
 static struct miscdevice mr_misc = {

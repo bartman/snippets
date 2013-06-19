@@ -10,6 +10,7 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/ioctl.h>
 
 
 void die(const char *fmt, ...)
@@ -42,11 +43,21 @@ int main(void)
 
 	printf("map[0] = 0x%08x\n", data[0]);
 
-	rc = msync(data, sizeof(data[0]), MS_SYNC);
-	if (rc)
-		die("msync(/dev/mr): %s\n", strerror(errno));
+	//rc = msync(data, sizeof(data[0]), MS_SYNC);
+	//if (rc)
+	//	die("msync(/dev/mr): %s\n", strerror(errno));
 
+	printf("Doing ioctl\n");
+	ioctl(fd, 55, NULL);
+
+	sleep(5);
 	printf("map[0] = 0x%08x\n", data[0]);
+	sleep(1);
+	printf("Modifying data[0]\n");
+	data[0] = 2;
+
+	sleep(1);
+
 
 	close(fd);
 	munmap(data, size);
