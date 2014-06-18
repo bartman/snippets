@@ -14,7 +14,12 @@ clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
 	@rm -f mrc
 
-load reload: all unload
+.PHONY: load reload unload
+reload:
+	${MAKE} unload
+	${MAKE} load
+
+load: all
 	sync
 	sync
 	sudo insmod mr.ko
