@@ -20,7 +20,8 @@ class markov_chain:
         contents = f.readlines()
         prev = ''
         for line in contents:
-            words = re.split('\s', line)
+            sline = re.sub(r'\s*([,.;()]+)(\s+|$)', ' \\1 ', line.strip())
+            words = re.split('\s', sline)
             for word in words:
                 if prev is word and prev is '':
                     continue
@@ -58,13 +59,13 @@ class markov_chain:
         word_count = 0
         width = 0
         prev = ''
+        space = ''
         while word_count < max_words:
             probs = self.probs[prev]
 
             r = random()
 
             word = ''
-            #for prob, word in probs.items():
             for tpl in probs:
                 prob = tpl[0]
                 if r <= prob:
@@ -72,17 +73,30 @@ class markov_chain:
                     break
 
             width += len(word)
-            newline = width > 70
-            if newline or word == '':
-                sep = '\n'
-                width = 0
-            else:
-                sep = ' '
+            empty = (word is '')
+            newline = (width > 70)
 
-            sys.stdout.write("%s%s"%(word,sep))
+            if re.match(r'[,.;)]',word):
+                space = ''
+
+            elif empty:
+                space = '\n\n'
+                width = 0
+
+            elif newline:
+                space = '\n'
+                width = 0
+
+            sys.stdout.write("%s%s"%(space,word))
+
+            space = ' '
+            if empty or re.match(r'[(]',word):
+                space = ''
 
             prev = word
             word_count += 1
+
+        sys.stdout.write("\n")
 
 mc = markov_chain()
 
