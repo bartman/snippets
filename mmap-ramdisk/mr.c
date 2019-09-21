@@ -162,21 +162,11 @@ struct mr_vma_priv {
 	struct page *pages[0];
 };
 
-
-void do_page_protect(void)
+static void mr_do_page_protect(struct mr_vma_priv *vp)
 {
-	struct mr_vma_priv *vp;
-	struct vm_area_struct *vma;
+	struct vm_area_struct *vma = vp->vma;
 	int i;
 
-	/* Just a proof of concept.  Resets all pages in the first VMA to WriteProtect */
-	vp = list_first_entry(&mr_vma_list, struct mr_vma_priv, list);
-	if (!vp) {
-		pr_info("List entry was NULL\n");
-		return;
-	}
-
-	vma = vp->vma;
 	pr_info("page_protect: vma=%p\n", vma);
 	for (i = 0; i < vp->max; i++) {
 		struct page *page = vp->pages[i];
@@ -220,6 +210,21 @@ void do_page_protect(void)
 		flush_cache_page(vma, address, pte_pfn(ptep));
 		pr_info("page_protect: After protect pte_flags=%lx\n", pte_flags(*ptep));
 	}
+}
+
+static void mr_do_page_protect_all(void)
+{
+	struct mr_vma_priv *vp;
+
+	if (list_empty(&mr_vma_list)) {
+		pr_info("List entry was NULL\n");
+		return;
+	}
+
+	list_for_each_entry(vp, &mr_vma_list, list) {
+		mr_do_page_protect(vp);
+	}
+
 	return;
 }
 
@@ -249,7 +254,7 @@ static void mr_vm_close(struct vm_area_struct * vma)
 			continue;
 
 		vp->pages[i] = NULL;
-		
+
 #if 0
 		ClearPageReserved(page);
 #endif
@@ -303,8 +308,9 @@ static vm_fault_t mr_vm_fault(struct vm_fault *vmf)
 		return VM_FAULT_SIGBUS;
 
 	page = vp->pages[index];
-	pr_info("fault: have page=%p\n", page);
-	if (!page) {
+	if (page) {
+		pr_info("fault: old page=%08lx\n", (uintptr_t)page);
+	} else {
 		page = alloc_page(GFP_KERNEL);
 		if (!page)
 			return VM_FAULT_OOM;
@@ -319,8 +325,8 @@ static vm_fault_t mr_vm_fault(struct vm_fault *vmf)
 			page = vp->pages[index];
 		}
 		spin_unlock(&vp->lock);
+		pr_info("fault: new page=%08lx\n", (uintptr_t)page);
 	}
-	pr_info("fault: using page=%p\n", page);
 
 #if 0
 	SetPageReserved(page);
@@ -637,7 +643,7 @@ static long mr_ioctl(struct file *filp, unsigned int command, unsigned long arg)
 	pr_info("ioctl: cmd=%d\n", command);
 	switch (command) {
 	case 55:
-		do_page_protect();
+		mr_do_page_protect_all();
 		return 0;
 	default:
 		return -EINVAL;
