@@ -1,0 +1,16 @@
+#!/bin/bash
+
+DIRS=( $(ls -d */ | grep -v '^arch\>') arch/x86 )
+
+if ! [ -d .git ] || ! [ -d kernel ] || ! [ -d arch ] || ! [ -f Makefile ] ; then
+        echo run this script in the kernel git repo
+        exit 1
+fi
+
+git grep -r -e '^SYSCALL_DEFINE.*(' -- "${DIRS[@]}" \
+| cut -d , -f 1 \
+| tr ':(' '  ' \
+| while read file defn syscall ; do
+        caps="$(sed -rne '/^SYSCALL_DEFINE2.bdflush/,/^}/p' fs/buffer.c | sed -rne 's/.*if.*capable\((CAP_[^)]*)\).*/\1/p')"
+        echo "$syscall $file $caps"
+done | sort | column -t
