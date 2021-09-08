@@ -7,10 +7,11 @@ if ! [ -d .git ] || ! [ -d kernel ] || ! [ -d arch ] || ! [ -f Makefile ] ; then
         exit 1
 fi
 
-git grep -r -e '^SYSCALL_DEFINE.*(' -- "${DIRS[@]}" \
-| cut -d , -f 1 \
-| tr ':(' '  ' \
+git grep -e '^SYSCALL_DEFINE.*(' -- "${DIRS[@]}" \
+| sed -r -e 's/[,)].*//' -e 's/[:(]/ /g' \
 | while read file defn syscall ; do
-        caps="$(sed -rne '/^SYSCALL_DEFINE2.bdflush/,/^}/p' fs/buffer.c | sed -rne 's/.*if.*capable\((CAP_[^)]*)\).*/\1/p')"
+        #echo sed -rne '/^'"$defn.$syscall"'/,/^}/p' $file
+        caps="$(sed -rne '/^'"$defn.$syscall"'/,/^}/p' $file | sed -rne 's/.*if.*\<capable\>.*\<(CAP_\S+)\>.*/\1/p')"
         echo "$syscall $file $caps"
+        #exit 1
 done | sort | column -t
