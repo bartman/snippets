@@ -1,0 +1,5 @@
+
+Unfortunately I gave up on this.  Some syscalls go down 2-3 function calls
+before they check `capable()`.  It would be a pain to do that from a shell
+script.
+
