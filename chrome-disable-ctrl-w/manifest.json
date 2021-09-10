@@ -1,0 +1,10 @@
+{
+        "manifest_version": 2,
+        "version": "1.0",
+        "name": "chrome-disable-ctrl-w",
+        "description": "Disable Ctr-W in Chrome.",
+        "content_scripts": [{
+                "js": ["disable-ctrl-w.user.js"],
+                "matches": ["<all_urls>"]
+        }]
+}
