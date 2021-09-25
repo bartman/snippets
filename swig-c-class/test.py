@@ -4,4 +4,4 @@ import example
 
 v = example.Vector(1,2,3)
 
-example.dump(v)
+print(v)
