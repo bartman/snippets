@@ -1,0 +1,9 @@
+Peeks at the page table entries of a process.
+
+pagemap.c copied from
+
+http://fivelinesofcode.blogspot.com/2014/03/how-to-translate-virtual-to-physical.html
+
+pagemap_dump.c copied from
+
+https://stackoverflow.com/questions/6284810/proc-pid-pagemaps-and-proc-pid-maps-linux/45500208#45500208

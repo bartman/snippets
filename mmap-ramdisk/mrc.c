@@ -28,7 +28,7 @@ int main(void)
 	uint32_t *data;
 	int fd, rc;
 	size_t size = 1024 * 1024;
-	
+
 	fd = open("/dev/mr", O_RDWR);
 	if (fd < 1) die("open(/dev/mr): %s\n", strerror(errno));
 
@@ -50,7 +50,7 @@ int main(void)
 	printf("Doing ioctl\n");
 	ioctl(fd, 55, NULL);
 
-	sleep(5);
+	sleep(1);
 	printf("map[0] = 0x%08x\n", data[0]);
 	sleep(1);
 	printf("Modifying data[0]\n");

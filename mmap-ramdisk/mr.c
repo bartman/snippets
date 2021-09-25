@@ -6,11 +6,15 @@
 #include <linux/mm.h>
 #include <linux/atomic.h>
 #include <linux/writeback.h>
-#include <linux/backing-dev.h>
+//#include <linux/backing-dev.h>    // noop_backing_dev_info is exported to GPL
 #include <linux/pagemap.h>
 #include <linux/rmap.h>
 
 #define USE_INSERT_PFN
+
+#ifndef PAGE_CACHE_SHIFT
+#define PAGE_CACHE_SHIFT PAGE_SHIFT
+#endif
 
 static DEFINE_SPINLOCK(mr_vma_list_lock);
 static LIST_HEAD(mr_vma_list);
@@ -103,6 +107,7 @@ static pte_t *mr__page_check_address(struct page *page, struct mm_struct *mm,
 			  unsigned long address, spinlock_t **ptlp, int sync)
 {
 	pgd_t *pgd;
+	p4d_t *p4d;
 	pud_t *pud;
 	pmd_t *pmd;
 	pte_t *pte;
@@ -112,7 +117,11 @@ static pte_t *mr__page_check_address(struct page *page, struct mm_struct *mm,
 	if (!pgd_present(*pgd))
 		return NULL;
 
-	pud = pud_offset(pgd, address);
+	p4d = p4d_offset(pgd, address);
+	if (!p4d_present(*p4d))
+		return NULL;
+
+	pud = pud_offset(p4d, address);
 	if (!pud_present(*pud))
 		return NULL;
 
@@ -153,21 +162,11 @@ struct mr_vma_priv {
 	struct page *pages[0];
 };
 
-
-void do_page_protect(void)
+static void mr_do_page_protect(struct mr_vma_priv *vp)
 {
-	struct mr_vma_priv *vp;
-	struct vm_area_struct *vma;
+	struct vm_area_struct *vma = vp->vma;
 	int i;
 
-	/* Just a proof of concept.  Resets all pages in the first VMA to WriteProtect */
-	vp = list_first_entry(&mr_vma_list, struct mr_vma_priv, list);
-	if (!vp) {
-		pr_info("List entry was NULL\n");
-		return;
-	}
-
-	vma = vp->vma;
 	pr_info("page_protect: vma=%p\n", vma);
 	for (i = 0; i < vp->max; i++) {
 		struct page *page = vp->pages[i];
@@ -211,6 +210,21 @@ void do_page_protect(void)
 		flush_cache_page(vma, address, pte_pfn(ptep));
 		pr_info("page_protect: After protect pte_flags=%lx\n", pte_flags(*ptep));
 	}
+}
+
+static void mr_do_page_protect_all(void)
+{
+	struct mr_vma_priv *vp;
+
+	if (list_empty(&mr_vma_list)) {
+		pr_info("List entry was NULL\n");
+		return;
+	}
+
+	list_for_each_entry(vp, &mr_vma_list, list) {
+		mr_do_page_protect(vp);
+	}
+
 	return;
 }
 
@@ -240,7 +254,7 @@ static void mr_vm_close(struct vm_area_struct * vma)
 			continue;
 
 		vp->pages[i] = NULL;
-		
+
 #if 0
 		ClearPageReserved(page);
 #endif
@@ -268,8 +282,9 @@ static void mr_vm_close(struct vm_area_struct * vma)
 	vfree(vp);
 }
 
-static int mr_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+static vm_fault_t mr_vm_fault(struct vm_fault *vmf)
 {
+	struct vm_area_struct *vma = vmf->vma;
 	struct mr_vma_priv *vp;
 	struct page *page;
 	unsigned long index;
@@ -282,7 +297,7 @@ static int mr_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 	pr_info("fault: vma=%p file=%p as=%p va=%p\n", vma,
 			vma->vm_file,
 			vma->vm_file ? vma->vm_file->f_mapping : NULL,
-			vmf->virtual_address);
+			(void*)vmf->address);
 
 	pr_info("fault: fault pfoff=%lu\n", vmf->pgoff);
 
@@ -293,8 +308,9 @@ static int mr_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		return VM_FAULT_SIGBUS;
 
 	page = vp->pages[index];
-	pr_info("fault: have page=%p\n", page);
-	if (!page) {
+	if (page) {
+		pr_info("fault: old page=%08lx\n", (uintptr_t)page);
+	} else {
 		page = alloc_page(GFP_KERNEL);
 		if (!page)
 			return VM_FAULT_OOM;
@@ -309,8 +325,8 @@ static int mr_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 			page = vp->pages[index];
 		}
 		spin_unlock(&vp->lock);
+		pr_info("fault: new page=%08lx\n", (uintptr_t)page);
 	}
-	pr_info("fault: using page=%p\n", page);
 
 #if 0
 	SetPageReserved(page);
@@ -339,11 +355,12 @@ static int mr_vm_access(struct vm_area_struct *vma, unsigned long addr,
 
 
 /* Notify when pages are promoted from WriteProtect to Read/Write */
-static int mr_vm_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+static vm_fault_t mr_vm_mkwrite(struct vm_fault *vmf)
 {
+	struct vm_area_struct *vma = vmf->vma;
 	pr_info("mkwrite: vma=%p, file=%p, as=%p, va=%p\n", vma, vma->vm_file,
 			vma->vm_file ? vma->vm_file->f_mapping : NULL,
-			vmf->virtual_address);
+			(void*)vmf->address);
 	return VM_FAULT_LOCKED;
 }
 
@@ -480,12 +497,16 @@ static int mr_set_page_dirty(struct page *page)
 	return rc;
 }
 
-static struct backing_dev_info mr_bdi = {
-	.capabilities   = (BDI_CAP_MAP_COPY | BDI_CAP_MAP_DIRECT |
-			   BDI_CAP_EXEC_MAP | BDI_CAP_READ_MAP |
-			   BDI_CAP_WRITE_MAP),
-};
-
+#ifndef CONFIG_MMU
+static unsigned mr_mmap_capabilities(struct file *file)
+{
+	return NOMMU_MAP_COPY
+		| NOMMU_MAP_DIRECT
+		| NOMMU_MAP_READ
+		| NOMMU_MAP_WRITE
+		| NOMMU_MAP_EXEC;
+}
+#endif
 
 static struct address_space_operations mr_asops = {
 	.readpage = mr_readpage,
@@ -524,9 +545,6 @@ static int mr_open(struct inode *inode, struct file *filp)
 
 	inode->i_mapping->a_ops =
 		inode->i_data.a_ops = &mr_asops;
-
-	// this might race, do I need to lock? wee bdev_inode_switch_bdi()
-	inode->i_data.backing_dev_info = &mr_bdi;
 
 	return rc;
 }
@@ -573,9 +591,10 @@ static int mr_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
 	pr_info("fsync: i_mapping->nrpages=%lu\n", im->nrpages);
 	pr_info("fsync: i_data.a_ops->nrpages=%lu\n", inode->i_data.nrpages);
 
-	pr_info("fsync: bdi=%p cap=%d\n",
-			im->backing_dev_info,
+#ifdef _LINUX_BACKING_DEV_H
+	pr_info("fsync: cap=%d\n",
 			mapping_cap_writeback_dirty(im));
+#endif
 
 	pr_info("fsync: writepages=%p, writepage=%p\n",
 			im->a_ops->writepages,
@@ -591,9 +610,9 @@ static int mr_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
 	}
 
 	if (!rc) {
-		mutex_lock(&inode->i_mutex);
+		inode = igrab(inode);
 		rc = sync_inode_metadata(inode, 1);
-		mutex_unlock(&inode->i_mutex);
+		iput(inode);
 	}
 #endif
 	return rc;
@@ -624,7 +643,7 @@ static long mr_ioctl(struct file *filp, unsigned int command, unsigned long arg)
 	pr_info("ioctl: cmd=%d\n", command);
 	switch (command) {
 	case 55:
-		do_page_protect();
+		mr_do_page_protect_all();
 		return 0;
 	default:
 		return -EINVAL;
@@ -640,6 +659,9 @@ static const struct file_operations mr_fops = {
 	.sendpage = mr_sendpage,
 	.write = mr_write,
 	.unlocked_ioctl = mr_ioctl,
+#ifndef CONFIG_MMU
+	.mmap_capabilities = mr_mmap_capabilities,
+#endif
 };
 
 static struct miscdevice mr_misc = {
