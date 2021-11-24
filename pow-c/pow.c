@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <assert.h>
 
 // if y==1, n=x
 // if y==2, n=x*x
@@ -47,12 +48,25 @@ static inline double double_time(void)
 }
 
 #define LOOPS 100
-#define MAXX 1000000
+#define MAXX 10000000
 #define MAXY 32
 int main(int main, char *argv[])
 {
 	double t0, t1, t2;
-	double tf=0, tg=0;
+	double tf=0, tg=0, af, ag, gain;
+
+	// verify correctness and warm up
+
+	for (int x = 1; x<MAXX; x++) {
+		for (int y=0; y<MAXY; y++) {
+			int a = f(x, y);
+			int b = g(x, y);
+			assert(a == b);
+		}
+	}
+
+
+	// do the benchmark
 
 	for (int loop=0; loop<LOOPS; loop++) {
 
@@ -76,10 +90,19 @@ int main(int main, char *argv[])
 
 		t2 = double_time();
 
+		// delta for each loop
 		tf += t1-t0;
 		tg += t2-t1;
 
-		printf("loop=%u f=%.6f g=%.6f\r", loop, tf/(loop+1), tg/(loop+1));
+		// average so far
+		af = tf/(loop+1);
+		ag = tg/(loop+1);
+
+		// improvement
+		gain = 1 - (ag/af);
+
+		printf("loop=%u f=%.6f g=%.6f gain=%.6f\r",
+		       loop, af, ag, gain);
 		fflush(stdout);
 	}
 
