@@ -4,7 +4,7 @@ CEXES = ${CSRCS:%.c=%}
 EXES = ${CEXES}
 
 CPPFLAGS =
-CFLAGS = -g -O3 -Wall -Werror
+CFLAGS = -g -O3 -Wall -Werror -march=native -mtune=native
 
 Q = $(if ${V},,@)
 
