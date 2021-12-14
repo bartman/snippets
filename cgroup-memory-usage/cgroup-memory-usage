@@ -1,0 +1,376 @@
+#!/bin/bash
+#
+# watch cgroup 'restricted' memory activity
+#
+# Ideas from:
+#
+#     https://gist.github.com/jakewarren/477ecd1149abe908cbd5cf7a7c9abaa3
+#
+
+set -e
+
+self=$0
+
+CGROUP=restricted
+[ -z "$USER" ] && USER=$(id -n -u)
+[ -z "$UID" ] && UID=$(id -u)
+[ -z "$GID" ] && GID=$(id -g)
+CPUS=$(nproc --all)
+TCPUS=0
+GRANULARITY=0000  # 10ms in usec (just the trailing zeros)
+GIGS=$(awk '/^MemTotal:/ { print int($2 / 1024 / 1024) }' /proc/meminfo)
+SOFT="$(( $GIGS / 4 ))"G
+HARD="$(( $GIGS / 2 ))"G
+SWAPPINESS=100
+FORCE=false
+
+SUDO=
+[ "$UID" = 0 ] || SUDO=sudo
+
+warn() { echo >&2 "$@" ; }
+die() { echo >&2 "$@" ; exit 1 ; }
+
+do_watch_single_type() {
+  local type="$1" ; shift # memory or cpus
+  local names=( "$@" )    # list of variable names
+
+  pushd /sys/fs/cgroup/$type/$CGROUP/ >/dev/null
+  echo "[$type/$CGROUP]"
+  wc -l tasks
+  grep . "${names[@]}" \
+    | while IFS=: read name value ; do
+      local gigs=
+      [[ "$name" =~ _in_bytes ]] && gigs=$(( $value >> 30 ))G
+      echo $name : $value : $gigs
+    done | column -t -s:
+  popd >/dev/null
+}
+
+memory_counters=(
+  memory.usage_in_bytes
+  memory.max_usage_in_bytes
+  memory.memsw.usage_in_bytes
+  memory.memsw.max_usage_in_bytes
+  memory.soft_limit_in_bytes
+  memory.limit_in_bytes
+  memory.swappiness
+  memory.failcnt
+)
+
+cpu_counters=(
+  cpu.cfs_period_us
+  cpu.cfs_quota_us
+)
+
+do_info() {
+  do_watch_single_type memory "${memory_counters[@]}"
+  echo
+
+  local cpustat=/sys/fs/cgroup/cpu/$CGROUP/cpu.stat
+  if [ -f $cpustat ] ; then
+    do_watch_single_type cpu "${cpu_counters[@]}"
+    echo
+    cat cpustat
+    echo
+  fi
+}
+do_watch() {
+   $SUDO watch -n1 -d $self --group "$CGROUP" --info
+}
+
+do_enable_rules() {
+   local user="$1"
+   local proc="$2"
+   local subs=( ${3//,/ } )
+   [ -z "$user" ] && die "user is empty"
+   [ -z "$proc" ] && die "proc is empty"
+   for pid in $( pgrep -u "$user" -f "$proc" ) ; do
+      for sub in ${subs[@]} ; do
+         local tasks=/sys/fs/cgroup/$sub/$CGROUP/tasks
+         [ -f $tasks ] || continue
+         grep -q "\<$pid\>" $tasks && continue
+         echo "$CGROUP $sub $pid"
+         $SUDO tee $tasks <<<$pid >/dev/null
+      done
+   done
+}
+do_enable() {
+   local filename="$1"
+   sed -rne '/^\s*[^#]\w+:\S+\s+\S+\s+\S+\s*$/p' "/etc/cgrules.conf" \
+   | while read user_process subsystems group ; do
+      local user="${user_process%:*}"
+      local proc="${user_process#*:}"
+      if [ -z "$group" ] || [ "$CGROUP" = "$group" ] ; then
+         do_enable_rules "$user" "$proc" "$subsystems"
+      fi
+   done
+}
+
+do_disable_pids_in() {
+   local sub=$1
+
+   local cgroup_tasks=/sys/fs/cgroup/$sub/$CGROUP/tasks
+   local global_tasks=/sys/fs/cgroup/$sub/tasks
+   for pid in $(cat $cgroup_tasks ) ; do
+      echo >&2 -n "$sub/$CGROUP: "
+      $SUDO tee $global_tasks <<<$pid
+   done
+}
+do_disable() {
+   local subs=( memory cpu ) # should come from config
+   for sub in ${subs[@]} ; do
+      do_disable_pids_in "$CGROUP" "$sub"
+   done
+}
+
+do_update_sys_variable() {
+  local type="$1"           # memory or cpu
+  local name="$2"           # variable name
+  local value="$3"          # new value
+
+  local file="/sys/fs/cgroup/$type/$CGROUP/$name"
+  local curr="$(cat "$file")"
+  if [ "$curr" != "$value" ] ; then
+    if ! $SUDO tee "$file" <<<"$value" >/dev/null ; then
+      die "failed $file <<< $value"
+    fi
+  fi
+
+  local new="$(cat "$file")"
+  echo "$CGROUP  $name  $new"
+}
+do_update() {
+  {
+  do_update_sys_variable  memory  memory.soft_limit_in_bytes  "${SOFT}"
+  do_update_sys_variable  memory  memory.limit_in_bytes       "${HARD}"
+  do_update_sys_variable  memory  memory.swappiness           "${SWAPPINESS}"
+  if [ $TCPUS -gt 0 ] ; then
+    do_update_sys_variable  cpu     cpu.cfs_quota_us            "${CPUS}${GRANULARITY}"
+    do_update_sys_variable  cpu     cpu.cfs_period_us           "${TCPUS}${GRANULARITY}"
+  fi
+  } | column -t
+}
+
+get_active_window() {
+   local ID=$(xprop -root _NET_ACTIVE_WINDOW | sed -rne 's/_NET_ACTIVE_WINDOW.* # //p')
+   [ -z "$ID" ] && die "could not get selected Window ID"
+   echo $ID
+}
+select_window() {
+   local ID=$(xwininfo | sed -rne 's/xwininfo: Window id: (0x\S+) .*/\1/p')
+   [ -z "$ID" ] && die "could not get active Window ID"
+   echo $ID
+}
+get_pid_of_window() {
+   local ID=$1
+
+   PID=$(xprop -id $ID _NET_WM_PID | sed -rne 's/_NET_WM_PID\S+ = //p')
+   [ -z "$PID" ] && die "could not get PID property from Window ID $ID"
+
+   echo $PID
+}
+do_update_one_pid() {
+   local add_to_cgroup="$1"
+   local pid="$2"
+   [ -z "$CGROUP" ] && die "cgroup is empty"
+   [ -z "$pid" ] && die "pid is empty"
+
+   local cgroup="$CGROUP"
+   $add_to_cgroup || cgroup=
+
+   local subs=( memory cpu ) # should come from config
+
+   for sub in ${subs[@]} ; do
+      local tasks=/sys/fs/cgroup/$sub/$cgroup/tasks
+
+      echo "$pid > $tasks"
+      $SUDO tee $tasks <<<$pid >/dev/null
+   done
+}
+do_update_add_pid() {
+  do_update_one_pid true
+}
+do_update_remove_pid() {
+  do_update_one_pid false
+}
+
+do_list() {
+   [ -z "$CGROUP" ] && die "cgroup is empty"
+
+   local sub="memory"
+   local tasks=/sys/fs/cgroup/$sub/$CGROUP/tasks
+   [ -f $tasks ] || return
+   local pids="$( cat $tasks | xargs | tr ' ' , )"
+   [ -z "$pids" ] && die "no pids"
+   ps aux -q $pids
+}
+
+extract_conf() {
+   local name="$1"
+   sed -r -n -e "/^BEGIN $name/,/^END/p" "$self" \
+   | sed -e '1d' -e '$d'
+}
+
+translate_conf() {
+   sed -r -e "s/\\{CGROUP}/$CGROUP/" \
+          -e "s/\\{USER}/$USER/" \
+          -e "s/\\{UID}/$UID/" \
+          -e "s/\\{GID}/$GID/" \
+          -e "s/\\{CPUS}/$CPUS/" \
+          -e "s/\\{TCPUS}/$TCPUS/" \
+          -e "s/\\{SOFT}/$SOFT/" \
+          -e "s/\\{HARD}/$HARD/" \
+          -e "s/\\{SWAPPINESS}/$SWAPPINESS/"
+}
+
+gen_conf_filename() {
+   local name="$1"
+   case "$name" in
+      cgrules.conf)    echo "/etc/cgrules.conf" ;;
+      cgconfig.conf)   echo "/etc/cgconfig.conf" ;;
+      cgroups.service) echo "/etc/systemd/system/cgroups.service" ;;
+      *)               die "unhandled config '$name'" ;;
+   esac
+}
+
+do_install() {
+   [ -z "$CGROUP" ] && die "CGROUP not specified"
+   for name in "cgrules.conf" "cgconfig.conf" "cgroups.service" ; do
+      local dst="$(gen_conf_filename "$name")"
+      if [ -f "$dst" ] && ! $FORCE ; then
+         warn "$dst: file exists"
+      else
+         echo >&2 "generating $dst"
+         extract_conf "$name" | translate_conf | $SUDO tee "$dst" >/dev/null
+      fi
+   done
+
+   cat <<END
+
+You can now run:
+
+   $SUDO systemctl enable --now cgroups.service
+
+END
+   exit 0
+}
+
+do_help() {
+   cat <<END
+${self#*/} ...
+
+Help:
+ -h --help                      this help
+
+Modifiers:
+ -g --group <name>              cgroup to use (default is $CGROUP)
+ -C --throttle-cpus <number>    CPUs when throttling (default is $TCPUS of $CPUS)
+ -S --soft-limit <gigs>         soft limit threshold (default is $SOFT)
+ -H --hard-limit <gigs>         hard limit threshold (default is $HARD)
+
+Inspect actions:
+ -w --watch                     watch mode
+ -1 --info                    show once, exit
+ -L --list                      show managed PIDs
+
+Global update actions:
+ -e --enable                    move PIDs matching /etc/cgrules.conf to cgroup
+ -d --disable                   move cgroup PIDs to global group
+ -u --update                    update throttle/limits in /sys
+
+Add/remove actions:
+ -p --pid <pid>                 restrict PID
+ -P --no-pid <pid>              do not restrict PID
+ --active                       restrict active window
+ --no-active                    do not restrict active window
+ --selected                     restrict selected window
+ --no-selected                  do not restrict selected window
+
+Install system scripts action:
+ -i --install                   install config files (can be used with --force)
+
+END
+   exit 0
+}
+
+ACTION=do_watch
+
+while [[ "${1:0:1}" == '-' ]] ; do
+   cmd=$1 ; shift
+   case $cmd in
+      -h|--help)          do_help ;;
+      -g|--group)         CGROUP="$1" ; shift ;;
+      -C|--throttle-cpus) TCPUS="$1"  ; shift ;;
+      -S|--soft-limit)    SOFT="$1"   ; shift ;;
+      -H|--hard-limit)    HARD="$1"   ; shift ;;
+      --force)            FORCE=true          ;;
+      -w|--watch)         ACTION=do_watch     ;;
+      -1|--info)          ACTION=do_info      ;;
+      -e|--enable)        ACTION=do_enable    ;;
+      -d|--disable)       ACTION=do_disable   ;;
+      -u|--update)        ACTION=do_update    ;;
+      -l|--list)          ACTION=do_list      ;;
+      -i|--install)       ACTION=do_install   ;;
+      -p|--pid)           ACTION=do_update_add_pid    ; PID="$1" ; shift ;;
+      -P|--no-pid)        ACTION=do_update_remove_pid ; PID="$1" ; shift ;;
+      --active)           ACTION=do_update_add_pid    ; PID="$(get_pid_of_window "$(get_active_window)")" ;;
+      --no-active)        ACTION=do_update_remove_pid ; PID="$(get_pid_of_window "$(get_active_window)")" ;;
+      --selected)         ACTION=do_update_add_pid    ; PID="$(get_pid_of_window "$(select_window)")" ;;
+      --no-selected)      ACTION=do_update_remove_pid ; PID="$(get_pid_of_window "$(select_window)")" ;;
+      -*) die "unknown option $cmd"
+   esac
+done
+$ACTION
+exit 0
+
+# this is the end of the script, below are config files used by do_install
+
+BEGIN cgrules.conf
+#{USER}:/opt/google/chrome/chrome    cpu,memory   {CGROUP}
+#{USER}:/opt/brave.com/brave/brave   cpu,memory   {CGROUP}
+{USER}:/opt/google/chrome/chrome    memory   {CGROUP}
+{USER}:/opt/brave.com/brave/brave   memory   {CGROUP}
+END
+
+BEGIN cgconfig.conf
+group {CGROUP} {
+  perm {
+    task {
+      uid = {UID};
+      gid = {GID};
+    }
+    admin {
+      uid = {UID};
+      gid = {GID};
+    }
+  }
+# cpu {
+#   # allow only {TCPUS} CPU out of {CPUS} when throttling, 1{GRANULARITY}us granularity
+#   cpu.cfs_quota_us =  {CPUS}{GRANULARITY};
+#   cpu.cfs_period_us = {TCPUS}{GRANULARITY};
+# }
+  memory {
+    # soft limit < hard limit
+    memory.limit_in_bytes = "{HARD}G";
+    memory.soft_limit_in_bytes = "{SOFT}G";
+    memory.swappiness = "{SWAPPINESS}";
+  }
+}
+END
+
+BEGIN cgroups.service
+[Unit]
+Description={CGROUP} cgroup service file
+After=remote-fs.target
+
+[Service]
+Type=forking
+ExecStartPre=/bin/echo "Processing /etc/cgconfig.conf..."
+ExecStartPre=/usr/sbin/cgconfigparser -l /etc/cgconfig.conf
+ExecStartPre=/bin/echo "Processing /etc/cgrules.conf..."
+ExecStart=/usr/sbin/cgrulesengd --syslog
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+END
