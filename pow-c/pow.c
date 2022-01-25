@@ -7,7 +7,9 @@
 // if y==2, n=x*x
 // if y==3, n=x*x*x
 
-unsigned int f(unsigned int x, unsigned int y) {
+__attribute__((noinline))
+unsigned int f(unsigned int x, unsigned int y)
+{
 	unsigned int n = 1;
 	while (y > 0) {
 		// n * (x ^ y) is invariant
@@ -22,6 +24,7 @@ unsigned int f(unsigned int x, unsigned int y) {
 	return n;
 }
 
+__attribute__((noinline))
 unsigned int g(unsigned int x, unsigned int y)
 {
 	unsigned int n = 1;
