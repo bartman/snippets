@@ -254,8 +254,8 @@ do_install() {
 
 Next you should review the configuration files:
 
-  vim ${CGCONFIG_CONF}        <-- manage your cgroups
-  vim ${CGRULES_CONF}         <-- match programs to cgroups
+  $SUDO vim ${CGCONFIG_CONF}        <-- manage your cgroups
+  $SUDO vim ${CGRULES_CONF}         <-- match programs to cgroups
 
 Then you can start the service by running:
 
