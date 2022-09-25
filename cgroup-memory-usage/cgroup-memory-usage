@@ -272,15 +272,14 @@ do_install() {
 
 Next you should review the configuration files:
 
-  $self --edit-config
+  ${self##*/} --edit-config
 
         ${CGCONFIG_CONF}    -- define cgroup and their constraints
         ${CGRULES_CONF}     -- how processes are matches to cgroups
 
 Then you can start the service by running:
 
-  $self --service-enable
-  $self --service-start
+  ${self##*/} --service-enable
 
 END
    exit 0
@@ -290,30 +289,13 @@ do_edit_config() {
   do_conf_check
   $SUDO "${EDITOR:-vim##*/}" "${CGCONFIG_CONF}" "${CGRULES_CONF}"
 }
-do_service_enable() {
+
+SERVICE_ACTION=
+do_service_action() {
   do_exec_check
   do_conf_check
-  $SUDO systemctl enable --now ${CGROUPS_SERVICE##*/}
-}
-do_service_disable() {
-  do_exec_check
-  do_conf_check
-  $SUDO systemctl disable --now ${CGROUPS_SERVICE##*/}
-}
-do_service_start() {
-  do_exec_check
-  do_conf_check
-  $SUDO systemctl start ${CGROUPS_SERVICE##*/}
-}
-do_service_stop() {
-  do_exec_check
-  do_conf_check
-  $SUDO systemctl stop ${CGROUPS_SERVICE##*/}
-}
-do_service_status() {
-  do_exec_check
-  do_conf_check
-  $SUDO systemctl status ${CGROUPS_SERVICE##*/}
+  [ -z "$SERVICE_ACTION" ] && die "SERVICE_ACTION not set; internal error"
+  $SUDO systemctl $SERVICE_ACTION ${CGROUPS_SERVICE##*/}
 }
 
 do_help() {
@@ -354,9 +336,12 @@ Configuration files:
  --edit-config                  open '${EDITOR:-vim##*/}' to edit config files
 
 Manage '${CGRULESENGD##*/}' service:
+ --service-enable               enable and start the systemd service
+ --service-disable              disable and stop the systemd service
  --service-start                start the systemd service
  --service-stop                 stop the systemd service
  --service-status               check status of systemd service
+ --service-restart              restart the dystemd serivce
 
 END
    exit 0
@@ -379,7 +364,7 @@ while [[ "${1:0:1}" == '-' ]] ; do
       -e|--enable)        ACTION=do_enable    ;;
       -d|--disable)       ACTION=do_disable   ;;
       -u|--update)        ACTION=do_update    ;;
-      -l|--list)          ACTION=do_list      ;;
+      -L|--list)          ACTION=do_list      ;;
       -i|--install)       ACTION=do_install   ;;
       -p|--pid)           ACTION=do_update_add_pid    ; PID="$1" ; shift ;;
       -P|--no-pid)        ACTION=do_update_remove_pid ; PID="$1" ; shift ;;
@@ -388,11 +373,13 @@ while [[ "${1:0:1}" == '-' ]] ; do
       --selected)         ACTION=do_update_add_pid    ; PID="$(get_pid_of_window "$(select_window)")" ;;
       --no-selected)      ACTION=do_update_remove_pid ; PID="$(get_pid_of_window "$(select_window)")" ;;
       --edit-config)      ACTION=do_edit_config ;;
-      --service-enable)   ACTION=do_service_enable ;;
-      --service-disable)  ACTION=do_service_disable ;;
-      --service-start)    ACTION=do_service_start ;;
-      --service-stop)     ACTION=do_service_stop ;;
-      --service-status)   ACTION=do_service_status ;;
+      --service-enable)   ACTION=do_service_action SERVICE_ACTION="enable --now"  ;;
+      --service-disable)  ACTION=do_service_action SERVICE_ACTION="disable --now" ;;
+      --service-start)    ACTION=do_service_action SERVICE_ACTION="start"         ;;
+      --service-stop)     ACTION=do_service_action SERVICE_ACTION="stop"          ;;
+      --service-status)   ACTION=do_service_action SERVICE_ACTION="status"        ;;
+      --service-restart)  ACTION=do_service_action SERVICE_ACTION="restart"       ;;
+      --service-reload)   ACTION=do_service_action SERVICE_ACTION="reload"        ;;
       -*) die "unknown option $cmd"
    esac
 done
@@ -427,8 +414,8 @@ group {CGROUP} {
 # }
   memory {
     # soft limit < hard limit
-    memory.limit_in_bytes = "{HARD}G";
-    memory.soft_limit_in_bytes = "{SOFT}G";
+    memory.limit_in_bytes = "{HARD}";
+    memory.soft_limit_in_bytes = "{SOFT}";
     memory.swappiness = "{SWAPPINESS}";
   }
 }
