@@ -24,6 +24,16 @@ HARD="$(( $GIGS / 2 ))"G
 SWAPPINESS=100
 FORCE=false
 
+# executables
+CGCONFIGPARSER=/usr/sbin/cgconfigparser
+CGRULESENGD=/usr/sbin/cgrulesengd
+
+# configuration files
+CGRULES_CONF="/etc/cgrules.conf"
+CGCONFIG_CONF="/etc/cgconfig.conf"
+CGROUPS_SERVICE="/etc/systemd/system/cgroups.service"
+
+
 SUDO=
 [ "$UID" = 0 ] || SUDO=sudo
 
@@ -96,7 +106,7 @@ do_enable_rules() {
 }
 do_enable() {
    local filename="$1"
-   sed -rne '/^\s*[^#]\w+:\S+\s+\S+\s+\S+\s*$/p' "/etc/cgrules.conf" \
+   sed -rne '/^\s*[^#]\w+:\S+\s+\S+\s+\S+\s*$/p' "$CGRULES_CONF" \
    | while read user_process subsystems group ; do
       local user="${user_process%:*}"
       local proc="${user_process#*:}"
@@ -220,36 +230,36 @@ translate_conf() {
           -e "s/\\{TCPUS}/$TCPUS/" \
           -e "s/\\{SOFT}/$SOFT/" \
           -e "s/\\{HARD}/$HARD/" \
-          -e "s/\\{SWAPPINESS}/$SWAPPINESS/"
-}
-
-gen_conf_filename() {
-   local name="$1"
-   case "$name" in
-      cgrules.conf)    echo "/etc/cgrules.conf" ;;
-      cgconfig.conf)   echo "/etc/cgconfig.conf" ;;
-      cgroups.service) echo "/etc/systemd/system/cgroups.service" ;;
-      *)               die "unhandled config '$name'" ;;
-   esac
+          -e "s,\\{SWAPPINESS},$SWAPPINESS," \
+          -e "s,\\{CGCONFIGPARSER},$CGCONFIGPARSER," \
+          -e "s,\\{CGRULESENGD},$CGRULESENGD," \
+          -e "s,\\{CGRULES_CONF},$CGRULES_CONF," \
+          -e "s,\\{CGCONFIG_CONF},$CGCONFIG_CONF," \
+          -e "s,\\{CGROUPS_SERVICE},$CGROUPS_SERVICE,"
 }
 
 do_install() {
    [ -z "$CGROUP" ] && die "CGROUP not specified"
-   for name in "cgrules.conf" "cgconfig.conf" "cgroups.service" ; do
-      local dst="$(gen_conf_filename "$name")"
-      if [ -f "$dst" ] && ! $FORCE ; then
-         warn "$dst: file exists (use --force to overwrite)"
+   for cnf in $CGRULES_CONF $CGCONFIG_CONF $CGROUPS_SERVICE ; do
+      local name="${cnf##*/}"
+      if [ -f "$cnf" ] && ! $FORCE ; then
+         warn "$cnf: file exists (use --force to overwrite)"
       else
-         echo >&2 "generating $dst"
-         extract_conf "$name" | translate_conf | $SUDO tee "$dst" >/dev/null
+         echo >&2 "generating $cnf"
+         extract_conf "$name" | translate_conf | $SUDO tee "$cnf" >/dev/null
       fi
    done
 
    cat <<END
 
-You can now run:
+Next you should review the configuration files:
 
-   $SUDO systemctl enable --now cgroups.service
+  vim ${CGCONFIG_CONF}        <-- manage your cgroups
+  vim ${CGRULES_CONF}         <-- match programs to cgroups
+
+Then you can start the service by running:
+
+  $SUDO systemctl enable --now ${CGROUPS_SERVICE##*/}
 
 END
    exit 0
@@ -274,7 +284,7 @@ Inspect actions:
  -L --list                      show managed PIDs
 
 Global update actions:
- -e --enable                    move PIDs matching /etc/cgrules.conf to cgroup
+ -e --enable                    move PIDs matching $CGRULES_CONF to cgroup
  -d --disable                   move cgroup PIDs to global group
  -u --update                    update throttle/limits in /sys
 
@@ -299,6 +309,7 @@ while [[ "${1:0:1}" == '-' ]] ; do
    cmd=$1 ; shift
    case $cmd in
       -h|--help)          do_help ;;
+      --debug)            set -x ;;
       -g|--group)         CGROUP="$1" ; shift ;;
       -C|--throttle-cpus) TCPUS="$1"  ; shift ;;
       -S|--soft-limit)    SOFT="$1"   ; shift ;;
@@ -365,10 +376,10 @@ After=remote-fs.target
 
 [Service]
 Type=forking
-ExecStartPre=/bin/echo "Processing /etc/cgconfig.conf..."
-ExecStartPre=/usr/sbin/cgconfigparser -l /etc/cgconfig.conf
-ExecStartPre=/bin/echo "Processing /etc/cgrules.conf..."
-ExecStart=/usr/sbin/cgrulesengd --syslog
+ExecStartPre=/bin/echo "Processing {CGCONFIG_CONF}..."
+ExecStartPre={CGCONFIGPARSER} -l {CGCONFIG_CONF}
+ExecStartPre=/bin/echo "Processing {CGRULES_CONF}..."
+ExecStart={CGRULESENGD} --syslog
 Restart=on-failure
 
 [Install]
