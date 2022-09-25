@@ -215,6 +215,22 @@ do_list() {
    ps aux -q $pids
 }
 
+do_exec_check() {
+  for f in $CGCONFIGPARSER $CGRULESENGD ; do
+    if ! [ -f $f ] ; then
+      die "executable $f not found, maybe cgroup-tools package is not installed?"
+    fi
+  done
+}
+
+do_conf_check() {
+  for f in $CGRULES_CONF $CGCONFIG_CONF $CGROUPS_SERVICE ; do
+    if ! [ -f $f ] ; then
+      die "configuration $f not found, maybe ${self##*/} --install was not ran?"
+    fi
+  done
+}
+
 extract_conf() {
    local name="$1"
    sed -r -n -e "/^BEGIN $name/,/^END/p" "$self" \
@@ -230,6 +246,7 @@ translate_conf() {
           -e "s/\\{TCPUS}/$TCPUS/" \
           -e "s/\\{SOFT}/$SOFT/" \
           -e "s/\\{HARD}/$HARD/" \
+          -e "s/\\{GRANULARITY}/$GRANULARITY/" \
           -e "s,\\{SWAPPINESS},$SWAPPINESS," \
           -e "s,\\{CGCONFIGPARSER},$CGCONFIGPARSER," \
           -e "s,\\{CGRULESENGD},$CGRULESENGD," \
@@ -239,6 +256,7 @@ translate_conf() {
 }
 
 do_install() {
+   do_exec_check
    [ -z "$CGROUP" ] && die "CGROUP not specified"
    for cnf in $CGRULES_CONF $CGCONFIG_CONF $CGROUPS_SERVICE ; do
       local name="${cnf##*/}"
@@ -254,20 +272,53 @@ do_install() {
 
 Next you should review the configuration files:
 
-  $SUDO vim ${CGCONFIG_CONF}        <-- manage your cgroups
-  $SUDO vim ${CGRULES_CONF}         <-- match programs to cgroups
+  $self --edit-config
+
+        ${CGCONFIG_CONF}    -- define cgroup and their constraints
+        ${CGRULES_CONF}     -- how processes are matches to cgroups
 
 Then you can start the service by running:
 
-  $SUDO systemctl enable --now ${CGROUPS_SERVICE##*/}
+  $self --service-enable
+  $self --service-start
 
 END
    exit 0
 }
 
+do_edit_config() {
+  do_conf_check
+  $SUDO "${EDITOR:-vim##*/}" "${CGCONFIG_CONF}" "${CGRULES_CONF}"
+}
+do_service_enable() {
+  do_exec_check
+  do_conf_check
+  $SUDO systemctl enable --now ${CGROUPS_SERVICE##*/}
+}
+do_service_disable() {
+  do_exec_check
+  do_conf_check
+  $SUDO systemctl disable --now ${CGROUPS_SERVICE##*/}
+}
+do_service_start() {
+  do_exec_check
+  do_conf_check
+  $SUDO systemctl start ${CGROUPS_SERVICE##*/}
+}
+do_service_stop() {
+  do_exec_check
+  do_conf_check
+  $SUDO systemctl stop ${CGROUPS_SERVICE##*/}
+}
+do_service_status() {
+  do_exec_check
+  do_conf_check
+  $SUDO systemctl status ${CGROUPS_SERVICE##*/}
+}
+
 do_help() {
    cat <<END
-${self#*/} ...
+${self##*/} ...
 
 Help:
  -h --help                      this help
@@ -299,6 +350,14 @@ Add/remove actions:
 Install system scripts action:
  -i --install                   install config files (can be used with --force)
 
+Configuration files:
+ --edit-config                  open '${EDITOR:-vim##*/}' to edit config files
+
+Manage '${CGRULESENGD##*/}' service:
+ --service-start                start the systemd service
+ --service-stop                 stop the systemd service
+ --service-status               check status of systemd service
+
 END
    exit 0
 }
@@ -328,6 +387,12 @@ while [[ "${1:0:1}" == '-' ]] ; do
       --no-active)        ACTION=do_update_remove_pid ; PID="$(get_pid_of_window "$(get_active_window)")" ;;
       --selected)         ACTION=do_update_add_pid    ; PID="$(get_pid_of_window "$(select_window)")" ;;
       --no-selected)      ACTION=do_update_remove_pid ; PID="$(get_pid_of_window "$(select_window)")" ;;
+      --edit-config)      ACTION=do_edit_config ;;
+      --service-enable)   ACTION=do_service_enable ;;
+      --service-disable)  ACTION=do_service_disable ;;
+      --service-start)    ACTION=do_service_start ;;
+      --service-stop)     ACTION=do_service_stop ;;
+      --service-status)   ACTION=do_service_status ;;
       -*) die "unknown option $cmd"
    esac
 done
