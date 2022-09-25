@@ -238,7 +238,7 @@ do_install() {
    for name in "cgrules.conf" "cgconfig.conf" "cgroups.service" ; do
       local dst="$(gen_conf_filename "$name")"
       if [ -f "$dst" ] && ! $FORCE ; then
-         warn "$dst: file exists"
+         warn "$dst: file exists (use --force to overwrite)"
       else
          echo >&2 "generating $dst"
          extract_conf "$name" | translate_conf | $SUDO tee "$dst" >/dev/null
@@ -270,7 +270,7 @@ Modifiers:
 
 Inspect actions:
  -w --watch                     watch mode
- -1 --info                    show once, exit
+ -1 --info                      show once, exit
  -L --list                      show managed PIDs
 
 Global update actions:
@@ -328,8 +328,8 @@ exit 0
 BEGIN cgrules.conf
 #{USER}:/opt/google/chrome/chrome    cpu,memory   {CGROUP}
 #{USER}:/opt/brave.com/brave/brave   cpu,memory   {CGROUP}
-{USER}:/opt/google/chrome/chrome    memory   {CGROUP}
-{USER}:/opt/brave.com/brave/brave   memory   {CGROUP}
+#{USER}:/opt/google/chrome/chrome    memory   {CGROUP}
+#{USER}:/opt/brave.com/brave/brave   memory   {CGROUP}
 END
 
 BEGIN cgconfig.conf
