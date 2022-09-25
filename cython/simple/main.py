@@ -2,6 +2,6 @@
 
 import module
 
-module.foo()
+module.foo(123)
 
 

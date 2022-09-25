@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-def foo():
+cpdef int foo(int x):
     print("hello word")
 
 
