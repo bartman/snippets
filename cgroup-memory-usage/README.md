@@ -40,7 +40,7 @@ You should configure the cgrups and rules by running...
 Edit the `/etc/cgrules.conf` file to configure your classification
 accordingly.  See `man cgrules.conf` for further information.
 
-## starting the serivce
+## starting the service
 
 Finally you can enable and start the service...
 
@@ -67,7 +67,7 @@ watch counters (like top)
 ## updating config
 
 When the service is started, the `/etc/cgconfig.conf` will be used to
-create a new croupt.  It is posslbe change these values at runtime.
+create a new cgroup.  It is possible change these values at runtime.
 
 Update soft/hard runtime limits
 
