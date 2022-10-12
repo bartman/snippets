@@ -17,3 +17,5 @@ ${TARGET}: %: %.o Makefile
 ${OBJS}: %.o: %.c Makefile
 	@echo " CC $@ ($<)"
 	${Q}${CC} ${CPPFLAGS} ${CFLAGS} $(LDFLAGS) -o $@ -c $<
+
+print-% : ; @echo "$* = $($*)"

@@ -34,3 +34,4 @@ clean:
 	rm -f example_wrap.c example.py
 	rm -rf __pycache__
 
+print-% : ; @echo "$* = $($*)"

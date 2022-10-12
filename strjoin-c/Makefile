@@ -16,3 +16,5 @@ run:
 
 clean:
 	-rm -f *~ *.o ${TARGETS}
+
+print-% : ; @echo "$* = $($*)"

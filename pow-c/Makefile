@@ -14,3 +14,4 @@ ${CEXES}: %: %.c Makefile
 	@echo " BUILD $@ ($<)"
 	${Q}${CC} ${CPPFLAGS} ${CFLAGS} -o $@ $< $(LDFLAGS)
 
+print-% : ; @echo "$* = $($*)"

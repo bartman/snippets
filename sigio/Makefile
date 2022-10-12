@@ -29,3 +29,5 @@ clean::
 	-rm -f *~ *.o ${TARGET}
 
 distclean:: clean
+
+print-% : ; @echo "$* = $($*)"

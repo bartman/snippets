@@ -29,3 +29,5 @@ unload:
 		sync ; sync ; \
 		sudo rmmod mr ; \
 	fi
+
+print-% : ; @echo "$* = $($*)"
