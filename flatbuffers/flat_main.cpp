@@ -42,12 +42,22 @@ int main(void)
 
 	std::cout << "serialized.size() = " << serialized.size() << std::endl;
 
+	std::ios_base::fmtflags f( std::cout.flags() );
 	for (auto it : serialized) {
 		std::cout << " "
 			<< std::hex << std::setw(2) << std::setfill('0')
 			<< (int)it;
 	}
+	std::cout.flags( f );
 	std::cout << std::endl;
+
+	/* deserialize */
+
+	auto fm = Flat::GetMessage(serialized.data());
+
+	std::cout << "deserialized x=" << fm->x()
+		<< ", y=" << fm->y() << std::endl;
+
 
 	return 0;
 }
