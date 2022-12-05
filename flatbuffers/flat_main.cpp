@@ -6,25 +6,33 @@
 #include "message_generated.h"
 
 std::ostream& operator<<(std::ostream& o, const Flat::Message& m) {
-	return o << "(x=" << m.x() << ", y=" << m.y() << ")";
+	return o << "(x=" << m.x()
+		<< ", y=" << m.y()
+		<< ", z=" << m.z()
+		<< ")";
 }
 
 struct Message {
 	int x;
 	int y;
-	Message(int _x, int _y) : x(_x), y(_y) {}
+	int z;
+	Message(int _x, int _y, int _z)
+		: x(_x), y(_y), z(_z) {}
 	~Message() {}
 };
 
 std::ostream& operator<<(std::ostream& o, const Message& m) {
-	return o << "(x=" << m.x << ", y=" << m.y << ")";
+	return o << "(x=" << m.x
+		<< ", y=" << m.y
+		<< ", z=" << m.z
+		<< ")";
 }
 
 int main(void)
 {
 	/* this is our flat structure */
 
-	Message m(0x1111, 0x2222);
+	Message m(0x11111111, 0x22222222, 0x33333333);
 
 	std::cout << m << std::endl;
 	std::cout << "message size = " << sizeof(m) << std::endl;
@@ -32,7 +40,7 @@ int main(void)
 	/* serialize the message */
 
 	flatbuffers::FlatBufferBuilder builder(1024);
-	auto offset = Flat::CreateMessage(builder, m.x, m.y);
+	auto offset = Flat::CreateMessage(builder, m.x, m.y, m.z);
 	builder.Finish(offset);
 
 	std::vector<uint8_t> serialized(builder.GetBufferPointer(),
@@ -55,8 +63,7 @@ int main(void)
 
 	auto fm = Flat::GetMessage(serialized.data());
 
-	std::cout << "deserialized x=" << fm->x()
-		<< ", y=" << fm->y() << std::endl;
+	std::cout << "deserialized " << fm << std::endl;
 
 
 	return 0;

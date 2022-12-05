@@ -2,6 +2,7 @@ namespace Flat;
 table Message {
         x: int;
         y: int;
+        z: int;
 }
 root_type Message;
 
