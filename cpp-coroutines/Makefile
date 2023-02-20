@@ -12,7 +12,7 @@ EXES = ${CEXES} ${CXXEXES} ${RSEXES}
 ASAN = -g -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined
 
 CFLAGS = -Os --std=c11 -Wall -Werror ${ASAN} -ggdb
-CPPFLAGS = -Os --std=c++23 -fcoroutines -Wall -Werror ${ASAN} -ggdb -traditional-cpp
+CPPFLAGS = -Os --std=c++20 -fcoroutines -Wall -Werror ${ASAN} -ggdb -traditional-cpp
 LDFLAGS = ${ASAN} -pthread -ldl -lzmq -lczmq
 
 Q = $(if ${V},,@)
