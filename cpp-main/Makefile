@@ -1,17 +1,17 @@
 .PHONY: all build clean distclean
-all: build/flat
+all: build/all
 
-build/flat: build/Makefile
-	${MAKE} -C build/
+build/all: build/Makefile
+	cmake --build build
 
 build/Makefile: build CMakeLists.txt
-	cd build && cmake ..
+	cmake -S. -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=YES -DCMAKE_BUILD_TYPE=Debug
 
 build:
 	mkdir -p build
 
 clean:
-	${MAKE} -C build/ clean
+	cmake --build build --target clean
 
 distclean:
 	rm -rf build
