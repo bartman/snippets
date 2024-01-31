@@ -1,3 +1,6 @@
+#include <stdint.h>
+#include <stdio.h>
+
 static char* num_convert(uint64_t num, char str[32])
 {
 	static const char *num_units = " kMGTPEZY";
