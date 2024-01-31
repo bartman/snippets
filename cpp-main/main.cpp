@@ -5,6 +5,7 @@
 
 int foo(int i)
 {
+    int x;
     return 0;
 }
 
